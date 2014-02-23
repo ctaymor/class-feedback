@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */
-public class MySQLiteHelper extends SQLiteOpenHelper {
+public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "comments.db";
     private static final int DATABASE_VERSION = 1;
     
@@ -56,7 +56,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_RECIPIENT + " integer, "
             + COLUMN_CONTENT + " text not null);";
 
-    public MySQLiteHelper(Context context) {
+    public MySQLiteOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

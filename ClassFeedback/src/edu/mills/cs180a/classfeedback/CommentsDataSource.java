@@ -13,7 +13,7 @@ import android.util.Log;
 
 /**
  * Persistent data storage for {@link Comment} using a database defined in
- * {@link MySQLiteHelper}.  This reuses code from 
+ * {@link MySQLiteOpenHelper}.  This reuses code from 
  * <a href="http://www.vogella.com/tutorials/AndroidSQLite/article.html">
  * Android SQLite database and content provider - Tutorial</a> by Lars Vogella.
  * 
@@ -22,14 +22,14 @@ import android.util.Log;
 public class CommentsDataSource {
     private static final String TAG = "CommentsDataSource";
     private SQLiteDatabase database;
-    private MySQLiteHelper dbHelper;
+    private MySQLiteOpenHelper dbHelper;
     private String[] allColumns = { 
-            MySQLiteHelper.COLUMN_ID,
-            MySQLiteHelper.COLUMN_RECIPIENT,
-            MySQLiteHelper.COLUMN_CONTENT};
+            MySQLiteOpenHelper.COLUMN_ID,
+            MySQLiteOpenHelper.COLUMN_RECIPIENT,
+            MySQLiteOpenHelper.COLUMN_CONTENT};
 
     public CommentsDataSource(Context context) {
-        dbHelper = new MySQLiteHelper(context);
+        dbHelper = new MySQLiteOpenHelper(context);
     }
 
     /**
@@ -61,9 +61,9 @@ public class CommentsDataSource {
      */
     Comment createComment(int recipient, String content) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_RECIPIENT, recipient);
-        values.put(MySQLiteHelper.COLUMN_CONTENT, content);
-        long insertId = database.insert(MySQLiteHelper.TABLE_COMMENTS, null,
+        values.put(MySQLiteOpenHelper.COLUMN_RECIPIENT, recipient);
+        values.put(MySQLiteOpenHelper.COLUMN_CONTENT, content);
+        long insertId = database.insert(MySQLiteOpenHelper.TABLE_COMMENTS, null,
                 values);
         Log.d(TAG, "Inserted comment " + insertId + " into database.");
         return new Comment(insertId, recipient, content);
@@ -77,7 +77,7 @@ public class CommentsDataSource {
     List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
 
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
+        Cursor cursor = database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                 allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
@@ -92,9 +92,9 @@ public class CommentsDataSource {
 
     private Comment cursorToComment(Cursor cursor) {
         Comment comment = new Comment(
-                cursor.getLong(MySQLiteHelper.COLUMN_ID_POS), 
-                cursor.getInt(MySQLiteHelper.COLUMN_RECIPIENT_POS), 
-                cursor.getString(MySQLiteHelper.COLUMN_CONTENT_POS));
+                cursor.getLong(MySQLiteOpenHelper.COLUMN_ID_POS), 
+                cursor.getInt(MySQLiteOpenHelper.COLUMN_RECIPIENT_POS), 
+                cursor.getString(MySQLiteOpenHelper.COLUMN_CONTENT_POS));
         return comment;
     }
 }

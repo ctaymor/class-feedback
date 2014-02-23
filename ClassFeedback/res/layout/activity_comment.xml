@@ -17,6 +17,7 @@
         android:maxWidth="100dip"
         android:maxHeight="100dip"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/comment_image_content_description"
         android:src="@drawable/ic_launcher" />
 
     <EditText

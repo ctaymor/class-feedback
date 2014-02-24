@@ -76,10 +76,9 @@ public class CommentsDataSource {
      */
     List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
-
+        
         Cursor cursor = database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                 allColumns, null, null, null, null, null);
-
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);
@@ -87,6 +86,7 @@ public class CommentsDataSource {
             cursor.moveToNext();
         }
         cursor.close();
+        
         return comments;
     }
 

@@ -24,7 +24,6 @@ import android.widget.ImageView;
 public class CommentActivity extends Activity {
     static final String RECIPIENT = "COMMENT_RECIPIENT";
     private int recipient;
-    private CommentsDataSource cds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +38,7 @@ public class CommentActivity extends Activity {
         icon.setImageResource(person.getImageId());
         
         // Get a connection to the database.
-        cds = new CommentsDataSource(this);
+        final CommentsDataSource cds = new CommentsDataSource(this);
         cds.open();
         
         // Add listeners.

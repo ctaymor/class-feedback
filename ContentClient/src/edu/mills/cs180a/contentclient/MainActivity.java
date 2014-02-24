@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -18,8 +21,15 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(i, PICK_REQUEST);
+        
+        Button fetchOneButton = (Button) findViewById(R.id.fetchOneButton);
+        fetchOneButton.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(i, PICK_REQUEST);
+            }
+        });
     }
 
     // Code adapted from section 11.17 of The Android Cookbook by Ian Darwin (O'Reilly).
@@ -57,9 +67,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_REQUEST && resultCode == RESULT_OK) {
-            // Get the id of the selected contact.
             String email = getContactEmail(data.getData());
             Toast.makeText(this, "Found email: " + email, Toast.LENGTH_LONG).show();
+            // TODO: Request comments.
         } else {
             Log.w(TAG, "Did not pick contact.");
         }

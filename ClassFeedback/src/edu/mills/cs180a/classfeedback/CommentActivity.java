@@ -47,7 +47,8 @@ public class CommentActivity extends Activity {
             @Override
             public void onClick(View view) {
                 EditText commentField = (EditText) findViewById(R.id.commentEditText);
-                cds.createComment(recipient, commentField.getText().toString());
+                cds.createComment(Person.everyone[recipient].getEmail(), 
+                        commentField.getText().toString());
                 setResult(RESULT_OK);
                 finish();
             }

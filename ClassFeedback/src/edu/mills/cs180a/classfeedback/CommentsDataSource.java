@@ -55,11 +55,11 @@ public class CommentsDataSource {
      * This both adds the comment to the database and constructs a {@link Comment}
      * instance.
      * 
-     * @param recipient the index within {@link Person#everyone} of the recipient
+     * @param recipient the email address of the recipient
      * @param content the content of the comment
      * @return a new {@link Comment} instance
      */
-    Comment createComment(int recipient, String content) {
+    Comment createComment(String recipient, String content) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteOpenHelper.COLUMN_RECIPIENT, recipient);
         values.put(MySQLiteOpenHelper.COLUMN_CONTENT, content);
@@ -93,7 +93,7 @@ public class CommentsDataSource {
     private Comment cursorToComment(Cursor cursor) {
         Comment comment = new Comment(
                 cursor.getLong(MySQLiteOpenHelper.COLUMN_ID_POS), 
-                cursor.getInt(MySQLiteOpenHelper.COLUMN_RECIPIENT_POS), 
+                cursor.getString(MySQLiteOpenHelper.COLUMN_RECIPIENT_POS), 
                 cursor.getString(MySQLiteOpenHelper.COLUMN_CONTENT_POS));
         return comment;
     }

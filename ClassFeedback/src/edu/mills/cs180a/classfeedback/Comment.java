@@ -10,30 +10,30 @@ package edu.mills.cs180a.classfeedback;
  */
 public class Comment {
     private long mId;
-    private int mRecipient;
+    private String mRecipient;
     private String mContent;
     
-    Comment(long id, int recipient, String content) {
+    Comment(long id, String recipient, String content) {
         mId = id;
         mRecipient = recipient;
         mContent = content;
     }
     
     /**
-     * Gets the id of the recipient.
+     * Gets the email address of the recipient.
      *
-     * @return the id of the recipient
+     * @return the email address of the recipient
      */
-    int getRecipient() {
+    String getRecipient() {
         return mRecipient;
     }
     
     /**
-     * Sets the index of the recipient.
+     * Sets the email address of the recipient.
      *
-     * @param recipient the index of the recipient
+     * @param recipient the email address of the recipient
      */
-    void setRecipient(int recipient) {
+    void setRecipient(String recipient) {
         mRecipient = recipient;
     }
     

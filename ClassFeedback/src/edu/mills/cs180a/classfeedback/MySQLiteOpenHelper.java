@@ -53,7 +53,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE = "create table "
             + TABLE_COMMENTS + "("
             + COLUMN_ID  + " integer primary key autoincrement, "
-            + COLUMN_RECIPIENT + " integer, "
+            + COLUMN_RECIPIENT + " text not null, "
             + COLUMN_CONTENT + " text not null);";
 
     public MySQLiteOpenHelper(Context context) {

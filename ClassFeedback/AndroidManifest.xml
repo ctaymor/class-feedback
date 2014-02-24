@@ -28,7 +28,8 @@
         </activity>
         <provider
             android:name=".CommentProvider"
-            android:authorities="edu.cs.mills.cs180a.classfeedback.commentprovider" >
+            android:authorities="edu.cs.mills.cs180a.classfeedback.commentprovider"
+            android:exported="true" >
         </provider>
     </application>
 

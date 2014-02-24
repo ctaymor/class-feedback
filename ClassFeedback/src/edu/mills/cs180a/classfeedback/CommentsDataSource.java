@@ -69,11 +69,22 @@ public class CommentsDataSource {
         return new Comment(insertId, recipient, content);
     }
     
+    /**
+     * Queries the database for all comments for the specified recipient.
+     * 
+     * @param recipient the email address of the target of the comment
+     * @return a {@code Cursor} pointing to all comments for the recipient
+     */
     Cursor getCursorForCommentsForRecipient(String recipient) {
         return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                 allColumns, "recipient = " + recipient, null, null, null, null);
     }
 
+    /**
+     * Queries database for all comments.
+     * 
+     * @return a {@code cursor} referencing all comments in the database
+     */
     Cursor getCursorForAllComments() {
         return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                 allColumns, null, null, null, null, null);

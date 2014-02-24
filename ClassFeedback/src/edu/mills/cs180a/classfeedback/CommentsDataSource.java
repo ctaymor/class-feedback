@@ -68,7 +68,17 @@ public class CommentsDataSource {
         Log.d(TAG, "Inserted comment " + insertId + " into database.");
         return new Comment(insertId, recipient, content);
     }
+    
+    Cursor getCursorForCommentsForRecipient(String recipient) {
+        return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                allColumns, "recipient = " + recipient, null, null, null, null);
+    }
 
+    Cursor getCursorForAllComments() {
+        return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                allColumns, null, null, null, null, null);
+    }
+    
     /**
      * Retrieve all comments from the database.
      * 
@@ -77,8 +87,7 @@ public class CommentsDataSource {
     List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
         
-        Cursor cursor = database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                allColumns, null, null, null, null, null);
+        Cursor cursor = getCursorForAllComments();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);

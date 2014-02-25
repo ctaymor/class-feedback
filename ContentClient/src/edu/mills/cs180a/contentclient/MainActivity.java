@@ -2,6 +2,7 @@
 package edu.mills.cs180a.contentclient;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,6 +14,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+/**
+ * An {@code Activity} that enables the user to pick a contact, then retrieve
+ * comments meant for the contact.
+ * 
+ * @author ellen.spertus@gmail.com (Ellen Spertus)
+ */
 public class MainActivity extends Activity {
     private static final int PICK_REQUEST = 1;
     private static final String TAG = "MainActivity";
@@ -26,7 +33,8 @@ public class MainActivity extends Activity {
         fetchOneButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                Intent i = new Intent(Intent.ACTION_PICK, 
+                        ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(i, PICK_REQUEST);
             }
         });
@@ -38,7 +46,11 @@ public class MainActivity extends Activity {
         // Get id of contact.
         Cursor contactCursor = getContentResolver().query(contactUri, null, null, null, null);
         int columnIndexForId = contactCursor.getColumnIndex(ContactsContract.Contacts._ID);
-        String contactId = contactCursor.getString(columnIndexForId);
+        if (!contactCursor.moveToFirst()) {
+            contactCursor.close();
+            return "";
+        }
+        int contactId = contactCursor.getInt(columnIndexForId);
 
         // Now that we have an id, we can request the email address.
         Cursor emailsCursor = getContentResolver().query(
@@ -47,7 +59,7 @@ public class MainActivity extends Activity {
                 null, null);
 
         // Get the (first) email address.
-        String email = "";
+        String email;
         if (emailsCursor.moveToFirst()) {
             email = emailsCursor.getString(emailsCursor.getColumnIndex(
                     ContactsContract.CommonDataKinds.Email.ADDRESS));
@@ -55,6 +67,7 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "Additional emails ignored.");
             }
         } else {
+            email = "";
             Log.w(TAG, "No email address found for contact.");
         }
         
@@ -67,9 +80,21 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_REQUEST && resultCode == RESULT_OK) {
+            // Extract email address.
             String email = getContactEmail(data.getData());
             Toast.makeText(this, "Found email: " + email, Toast.LENGTH_LONG).show();
-            // TODO: Request comments.
+
+            // Request comments.
+            ContentResolver resolver = getContentResolver();
+            Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + email);
+            String[] projection = { "content" };  // desired columns
+            Cursor cursor = resolver.query(uri, projection, null, null, null);
+            assert(cursor != null);
+            while (cursor.moveToNext()) {
+                String s = cursor.getString(0);
+                Log.d(TAG, "Found comment: " + s);
+            }
+            cursor.close();
         } else {
             Log.w(TAG, "Did not pick contact.");
         }

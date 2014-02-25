@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.util.Log;
 
 public class CommentContentProvider extends ContentProvider {
+    private static final String TAG = "CommentContentProvider";
     public static final String AUTHORITY = "edu.mills.cs180a.classfeedback";
     private static final String BASE_PATH = "comments";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
@@ -18,7 +19,6 @@ public class CommentContentProvider extends ContentProvider {
     private static final int COMMENTS = 1;
     private static final int COMMENTS_EMAIL = 2;
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    private static final String TAG = "CommentContentProvider";
     static {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH, COMMENTS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/*", COMMENTS_EMAIL);

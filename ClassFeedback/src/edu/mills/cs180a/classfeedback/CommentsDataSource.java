@@ -23,35 +23,37 @@ public class CommentsDataSource {
     private static final String TAG = "CommentsDataSource";
     private SQLiteDatabase database;
     private MySQLiteOpenHelper dbHelper;
-    private String[] allColumns = { 
-            MySQLiteOpenHelper.COLUMN_ID,
-            MySQLiteOpenHelper.COLUMN_RECIPIENT,
-            MySQLiteOpenHelper.COLUMN_CONTENT};
 
+    /**
+     * Constructs a {@code CommentsDataSource}.  The {@link #open()} method must be
+     * called before retrieving data from this.
+     * 
+     * @param context required context for the associated {@link SQLiteDatabase}
+     */
     public CommentsDataSource(Context context) {
         dbHelper = new MySQLiteOpenHelper(context);
     }
 
     /**
-     * Open a connection to the database, creating it if necessary.
+     * Opens a connection to the database, creating it if necessary.
      * This should be called before any of the other methods.
      * When the connection is no longer needed, {@link #close()} should be called.
      * 
-     * @throws SQLException if the database could not be opened.
+     * @throws SQLException if the database could not be opened
      */
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
 
     /**
-     * Close the connection to the database, opened with {@link #open()}.
+     * Closes the connection to the database, opened with {@link #open()}.
      */
     public void close() {
         dbHelper.close();
     }
 
     /**
-     * Create a comment with the specified content for the specified recipient.
+     * Creates a comment with the specified content for the specified recipient.
      * This both adds the comment to the database and constructs a {@link Comment}
      * instance.
      * 
@@ -107,11 +109,8 @@ public class CommentsDataSource {
      * @return all comments in the database
      */
     List<Comment> getAllComments(String[] projection) {
-        if (database == null) {
-            open();
-        }
         List<Comment> comments = new ArrayList<Comment>();
-
+        
         Cursor cursor = getCursorForAllComments(projection);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

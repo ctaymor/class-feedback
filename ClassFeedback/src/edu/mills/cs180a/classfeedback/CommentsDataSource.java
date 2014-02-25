@@ -60,6 +60,9 @@ public class CommentsDataSource {
      * @return a new {@link Comment} instance
      */
     Comment createComment(String recipient, String content) {
+        if (database == null) {
+            open();
+        }
         ContentValues values = new ContentValues();
         values.put(MySQLiteOpenHelper.COLUMN_RECIPIENT, recipient);
         values.put(MySQLiteOpenHelper.COLUMN_CONTENT, content);
@@ -68,37 +71,48 @@ public class CommentsDataSource {
         Log.d(TAG, "Inserted comment " + insertId + " into database.");
         return new Comment(insertId, recipient, content);
     }
-    
+
     /**
      * Queries the database for all comments for the specified recipient.
      * 
      * @param recipient the email address of the target of the comment
+     * @param projection the names of the columns to retrieve
      * @return a {@code Cursor} pointing to all comments for the recipient
      */
-    Cursor getCursorForCommentsForRecipient(String recipient) {
+    Cursor getCursorForCommentsForRecipient(String recipient, String[] projection) {
+        if (database == null) {
+            open();
+        }
         return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                allColumns, "recipient = " + recipient, null, null, null, null);
+                projection, "recipient = \"" + recipient + "\"", null, null, null, null);
     }
 
     /**
      * Queries database for all comments.
      * 
-     * @return a {@code cursor} referencing all comments in the database
+     * @param projection the names of the columns to retrieve
+     * @return a {@code Cursor} referencing all comments in the database
      */
-    Cursor getCursorForAllComments() {
+    Cursor getCursorForAllComments(String[] projection) {
+        if (database == null) {
+            open();
+        }
         return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                allColumns, null, null, null, null, null);
+                projection, null, null, null, null, null);
     }
-    
+
     /**
      * Retrieve all comments from the database.
      * 
      * @return all comments in the database
      */
-    List<Comment> getAllComments() {
+    List<Comment> getAllComments(String[] projection) {
+        if (database == null) {
+            open();
+        }
         List<Comment> comments = new ArrayList<Comment>();
-        
-        Cursor cursor = getCursorForAllComments();
+
+        Cursor cursor = getCursorForAllComments(projection);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);
@@ -106,7 +120,7 @@ public class CommentsDataSource {
             cursor.moveToNext();
         }
         cursor.close();
-        
+
         return comments;
     }
 

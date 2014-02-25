@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
@@ -13,7 +12,7 @@ public class CommentContentProvider extends ContentProvider {
     public static final String AUTHORITY = "edu.mills.cs180a.classfeedback";
     private static final String BASE_PATH = "comments";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
-            + BASE_PATH);
+            + "/" + BASE_PATH);
 
     // Set up URI matching.
     private static final int COMMENTS = 1;
@@ -33,16 +32,21 @@ public class CommentContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
+        Log.d(TAG, "In CommentContentProvider.query()");
         CommentsDataSource cds = new CommentsDataSource(getContext());
+        cds.open();
         Cursor cursor = null;
         switch (sURIMatcher.match(uri)) {
             case COMMENTS:
-                cursor = cds.getCursorForAllComments();
+                Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS");
+                cursor = cds.getCursorForAllComments(projection);
                 break;
             case COMMENTS_EMAIL:
-                cursor = cds.getCursorForCommentsForRecipient(uri.getLastPathSegment());
+                Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS_EMAIL");
+                cursor = cds.getCursorForCommentsForRecipient(uri.getLastPathSegment(), projection);
                 break;
             default:
+                Log.d(TAG, "In CommentContentProvider.query(), uri is not matched: " + uri);
                 throw new IllegalArgumentException("Illegal uri: " + uri);
         }
         // Notify anyone listening on the URI.

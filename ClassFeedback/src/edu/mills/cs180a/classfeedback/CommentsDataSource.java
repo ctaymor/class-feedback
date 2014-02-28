@@ -81,7 +81,7 @@ public class CommentsDataSource {
      * @param projection the names of the columns to retrieve
      * @return a {@code Cursor} pointing to all comments for the recipient
      */
-    Cursor getCursorForCommentsForRecipient(String recipient, String[] projection) {
+    public Cursor getCursorForCommentsForRecipient(String recipient, String[] projection) {
         if (database == null) {
             open();
         }

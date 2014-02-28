@@ -22,7 +22,7 @@ import android.widget.ImageView;
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */
 public class CommentActivity extends Activity {
-    static final String RECIPIENT = "COMMENT_RECIPIENT";
+    public static final String RECIPIENT = "COMMENT_RECIPIENT";
     private int recipient;
 
     @Override

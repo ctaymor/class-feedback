@@ -23,24 +23,27 @@ import android.widget.ImageView;
  */
 public class CommentActivity extends Activity {
     public static final String RECIPIENT = "COMMENT_RECIPIENT";
+    public static final String CDS_FACTORY = "CDS_FACTORY";
     private int recipient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
-        
+
         // Show a picture of the recipient.
         recipient = getIntent().getIntExtra(RECIPIENT, -1);
         assert(recipient >= 0 && recipient < Person.everyone.length);
         Person person = Person.everyone[recipient];
         ImageView icon = (ImageView) findViewById(R.id.commentImageView);
         icon.setImageResource(person.getImageId());
-        
+
         // Get a connection to the database.
-        final CommentsDataSource cds = new CommentsDataSource(this);
+        CommentsDataSourceAbstractFactory factory = 
+                (CommentsDataSourceAbstractFactory) getIntent().getSerializableExtra(CDS_FACTORY);
+        final CommentsDataSource cds = factory.createCommentsDataSource(this);
         cds.open();
-        
+
         // Add listeners.
         Button saveButton = (Button) findViewById(R.id.saveCommentButton);
         saveButton.setOnClickListener(new OnClickListener(){
@@ -49,6 +52,7 @@ public class CommentActivity extends Activity {
                 EditText commentField = (EditText) findViewById(R.id.commentEditText);
                 cds.createComment(Person.everyone[recipient].getEmail(), 
                         commentField.getText().toString());
+                cds.close();
                 setResult(RESULT_OK);
                 finish();
             }

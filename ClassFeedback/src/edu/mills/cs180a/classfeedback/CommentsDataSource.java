@@ -24,15 +24,24 @@ public class CommentsDataSource {
     private SQLiteDatabase database;
     private MySQLiteOpenHelper dbHelper;
 
-    /**
-     * Constructs a {@code CommentsDataSource}.  The {@link #open()} method must be
-     * called before retrieving data from this.
-     * 
-     * @param context required context for the associated {@link SQLiteDatabase}
-     */
-    public CommentsDataSource(Context context) {
+    protected CommentsDataSource(Context context) {
         dbHelper = new MySQLiteOpenHelper(context);
     }
+    
+    protected CommentsDataSource(Context context, String name) {
+        dbHelper = new MySQLiteOpenHelper(context, name);
+    }
+    
+    /**
+     * Constructs a {@code CommentsDataSource} with the specified name.  
+     * The {@link #open()} method must be called before retrieving data from this.
+     * 
+     * @param context required context for the associated {@link SQLiteDatabase}
+     * @return a source for a database with the specified context and name
+     */
+     public static CommentsDataSource create(Context context) {
+         return new CommentsDataSource(context);
+     }
 
     /**
      * Opens a connection to the database, creating it if necessary.
@@ -49,6 +58,7 @@ public class CommentsDataSource {
      * Closes the connection to the database, opened with {@link #open()}.
      */
     public void close() {
+        database.close();
         dbHelper.close();
     }
 
@@ -110,7 +120,7 @@ public class CommentsDataSource {
      */
     List<Comment> getAllComments(String[] projection) {
         List<Comment> comments = new ArrayList<Comment>();
-        
+
         Cursor cursor = getCursorForAllComments(projection);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

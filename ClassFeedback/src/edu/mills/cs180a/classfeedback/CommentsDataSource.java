@@ -118,10 +118,10 @@ public class CommentsDataSource {
      * 
      * @return all comments in the database
      */
-    List<Comment> getAllComments(String[] projection) {
+    List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
 
-        Cursor cursor = getCursorForAllComments(projection);
+        Cursor cursor = getCursorForAllComments(null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);
@@ -133,6 +133,8 @@ public class CommentsDataSource {
         return comments;
     }
 
+    // The cursor must have all of the columns in the default order,
+    // which happens if the cursor is created with a null projection.
     private Comment cursorToComment(Cursor cursor) {
         Comment comment = new Comment(
                 cursor.getLong(MySQLiteOpenHelper.COLUMN_ID_POS), 

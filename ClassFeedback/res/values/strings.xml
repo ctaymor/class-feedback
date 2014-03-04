@@ -10,4 +10,6 @@
     <string name="title_activity_comment">Comment Activity</string>
     <string name="comment_image_content_description">Image of recipient of comment</string>
     <string name="empty"></string>
+    <string name="comment_added">Comment added</string>
+    <string name="comment_canceled">Comment canceled</string>
 </resources>

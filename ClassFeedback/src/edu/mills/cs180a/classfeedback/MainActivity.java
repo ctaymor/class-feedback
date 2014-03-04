@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * An {@code Activity} that displays a list of the names of {@link Person people in CS 180A}.
@@ -39,7 +40,13 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO: Show a Toast saying whether comment was added or cancelled and for whom.
+        int resultMessageResourceId = 0;
+        if (resultCode == RESULT_OK) {
+            resultMessageResourceId = R.string.comment_added;
+        } else if (resultCode == RESULT_CANCELED) {
+            resultMessageResourceId = R.string.comment_canceled;
+        }
+        Toast.makeText(MainActivity.this, resultMessageResourceId, Toast.LENGTH_SHORT).show();
     }
     
     private class OnItemClickListener implements OnClickListener{       

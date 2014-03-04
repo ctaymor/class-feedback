@@ -14,12 +14,14 @@ import android.widget.ImageView;
  * The recipient of the comment is specified as an index into {@link Person#everyone}
  * and is communicated via the key {@link #RECIPIENT} in the {@link android.intent.Intent}.
  * 
- * <P>The user is given the choice of saving or canceling the comment.  If saved,
- * it is added to the database, and the result code {@link Activity#RESULT_OK} is
- * provided to the parent activity.  Otherwise, the database is not modified, and
- * the result code {@link Activity#RESULT_CANCELED} is provided.
+ * <P>The user is given the choice of saving or canceling the comment. They can also clear
+ * the text field.  If saved, it is added to the database, and the result 
+ * code {@link Activity#RESULT_OK} is provided to the parent activity.  Otherwise, 
+ * the database is not modified, and the result code {@link Activity#RESULT_CANCELED}
+ * is provided.
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
+ * @author ctaymor@gmail.com (Caroline Taymor)
  */
 public class CommentActivity extends Activity {
     static final String RECIPIENT = "COMMENT_RECIPIENT";
@@ -53,6 +55,16 @@ public class CommentActivity extends Activity {
                 finish();
             }
         });
+        
+        Button clearButton = (Button) findViewById(R.id.clearCommentButton);
+        clearButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                commentField.setText(R.string.empty);
+            }
+        });
+        
         Button cancelButton = (Button) findViewById(R.id.cancelCommentButton);
         cancelButton.setOnClickListener(new OnClickListener(){
             @Override

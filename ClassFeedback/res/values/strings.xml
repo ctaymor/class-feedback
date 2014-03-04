@@ -5,7 +5,9 @@
     <string name="row_image_content_description">Image of person named on row</string>
     <string name="comment_button">Comment</string>
     <string name="save_button">Save</string>
+    <string name="clear_button">Clear Text</string>
     <string name="cancel_button">Cancel</string>
     <string name="title_activity_comment">Comment Activity</string>
     <string name="comment_image_content_description">Image of recipient of comment</string>
+    <string name="empty"></string>
 </resources>

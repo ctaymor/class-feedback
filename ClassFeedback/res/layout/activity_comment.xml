@@ -41,7 +41,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save_button" />
-
+        
+        <Button
+            android:id="@+id/clearCommentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_button" />
+        
         <Button
             android:id="@+id/cancelCommentButton"
             android:layout_width="wrap_content"

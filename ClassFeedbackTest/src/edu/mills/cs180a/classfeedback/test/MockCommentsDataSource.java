@@ -10,6 +10,12 @@ public class MockCommentsDataSource extends CommentsDataSource {
         super(context, null);
     }
     
+    /**
+     * Provides a singleton instance of this class.
+     * 
+     * @param context the context for the underlying database (used only on first call)
+     * @return a singleton {@link MockCommentsDataSource}
+     */
     public static synchronized MockCommentsDataSource create(Context context) {
         if (instance == null) {
             instance = new MockCommentsDataSource(context);
@@ -19,5 +25,12 @@ public class MockCommentsDataSource extends CommentsDataSource {
     
     @Override
     public void close() {      
+    }
+    
+    /**
+     * Resets the data source to its initial empty condition.
+     */
+    public void reset() {
+        super.delete(null, null);
     }
 }

@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import edu.mills.cs180a.classfeedback.CommentActivity;
-import edu.mills.cs180a.classfeedback.CommentsDataSource;
 import edu.mills.cs180a.classfeedback.MySQLiteOpenHelper;
 import edu.mills.cs180a.classfeedback.Person;
 import edu.mills.cs180a.classfeedback.R;
@@ -26,7 +25,7 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     private EditText mCommentField;
     private Button mSaveButton;
     private Button mCancelButton;
-    private CommentsDataSource mCds;
+    private MockCommentsDataSource mCds;
     private static final String TAG = "CommentActivityTest";
 
     public CommentActivityTest() {
@@ -50,11 +49,15 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         mCommentField = (EditText) mActivity.findViewById(R.id.commentEditText);
         mSaveButton = (Button) mActivity.findViewById(R.id.saveCommentButton);
         mCancelButton = (Button) mActivity.findViewById(R.id.cancelCommentButton);
+        
+        // Get data source connection, in case it is needed.
+        mCds = MockCommentsDataSource.create(null);  // context argument ignored
     }
     
     protected void tearDown() throws Exception {
-        // Do not close mCds here.  CommentActivity will have closed it.
-        // mCds.close();
+        // Note that our tear down code must go before the call to super.tearDown(),
+        // which apparently nulls out our instance variables.
+        mCds.reset();
         super.tearDown();
     }
     
@@ -81,12 +84,12 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         cursor.close();
         return count;
     }
-    
-    @UiThreadTest
-    public void testCommentEntry() {
-        mCds = MockCommentsDataSource.create(null);  // context argument ignored
+
+    private void testCommentEntryInternal() {
+
         String[] desiredColumns = { MySQLiteOpenHelper.COLUMN_CONTENT };
-        assertEquals(0, getNumCommentsForRecipient(RECIPIENT));
+        assertEquals("Database is not empty at beginning of test.",
+                0, getNumCommentsForRecipient(RECIPIENT));
         
         // Simulate entering a comment.
         mCommentField.setText(COMMENT_TEXT);
@@ -99,5 +102,19 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         assertEquals(COMMENT_TEXT, cursor.getString(0));
         assertFalse(cursor.moveToNext());
         cursor.close();
+    }
+    
+    // Test comment entry twice, to make sure that the database has no comments
+    // at the beginning of each test.  Note that the order in which tests run
+    // is undefined within JUnit, so we cannot assume that testCommentEntry1()
+    // runs before testCommentEntry2().
+    @UiThreadTest
+    public void testCommentEntry1() {
+       testCommentEntryInternal();
+    }
+    
+    @UiThreadTest
+    public void testCommentEntry2() {
+       testCommentEntryInternal();
     }
 }

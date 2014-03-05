@@ -86,7 +86,6 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     }
 
     private void testCommentEntryInternal() {
-
         String[] desiredColumns = { MySQLiteOpenHelper.COLUMN_CONTENT };
         assertEquals("Database is not empty at beginning of test.",
                 0, getNumCommentsForRecipient(RECIPIENT));

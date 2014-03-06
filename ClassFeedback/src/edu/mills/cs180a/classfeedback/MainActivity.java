@@ -43,7 +43,8 @@ public class MainActivity extends Activity {
     }
     
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode,
+            int resultCode, Intent data) {
         int resultMessageResourceId = 0;
         if (resultCode == RESULT_OK) {
             if (data.getStringExtra(SUCCESS_TYPE).equals("Deleted")) {
@@ -54,7 +55,8 @@ public class MainActivity extends Activity {
         } else if (resultCode == RESULT_CANCELED) {
             resultMessageResourceId = R.string.comment_canceled;
         }
-        Toast.makeText(MainActivity.this, resultMessageResourceId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this,
+                resultMessageResourceId, Toast.LENGTH_SHORT).show();
     }
     
     private class OnItemClickListener implements OnClickListener{       
@@ -72,7 +74,8 @@ public class MainActivity extends Activity {
     
     private class PersonArrayAdapter extends ArrayAdapter<Person> {
         PersonArrayAdapter() {
-            super(MainActivity.this, R.layout.row, R.id.rowTextView, Person.everyone);
+            super(MainActivity.this, R.layout.row,
+                    R.id.rowTextView, Person.everyone);
         }
 
         @Override

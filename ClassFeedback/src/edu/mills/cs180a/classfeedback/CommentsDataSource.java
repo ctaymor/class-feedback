@@ -119,12 +119,14 @@ public class CommentsDataSource {
      * @param projection the names of the columns to retrieve
      * @return a {@code Cursor} pointing to all comments for the recipient
      */
-    Cursor getCursorForCommentsForRecipient(String recipient, String[] projection) {
+    Cursor getCursorForCommentsForRecipient(String recipient,
+            String[] projection) {
         if (database == null) {
             open();
         }
         return database.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                projection, "recipient = \"" + recipient + "\"", null, null, null, null);
+                projection, "recipient = \"" + recipient +
+                "\"", null, null, null, null);
     }
 
     /**

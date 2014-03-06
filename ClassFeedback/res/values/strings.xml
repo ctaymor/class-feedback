@@ -15,4 +15,5 @@
     <string name="delete_button">Delete</string>
     <string name="comment_deleted">Comment deleted</string>
     <string name="deleting_null">There is no comment to delete.</string>
+    <string name="mail_comment_button">Mail</string>
 </resources>

@@ -60,9 +60,11 @@ public class CommentActivity extends Activity {
         saveButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View view) {
-                EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                EditText commentField =
+                        (EditText) findViewById(R.id.commentEditText);
                 Person mPerson = Person.everyone[recipient];
-                Comment mOldComment = cds.getCommentForRecipient(mPerson.getEmail());
+                Comment mOldComment =
+                        cds.getCommentForRecipient(mPerson.getEmail());
                 if (mOldComment != null) {
                     mOldComment.setContent(commentField.getText().toString());
                     cds.updateComment(mOldComment);
@@ -81,7 +83,8 @@ public class CommentActivity extends Activity {
         clearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick (View view) {
-                EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                EditText commentField =
+                        (EditText) findViewById(R.id.commentEditText);
                 commentField.setText(R.string.empty);
             }
         });
@@ -95,13 +98,16 @@ public class CommentActivity extends Activity {
             }
         });
         
-         Button deleteButton = (Button) findViewById(R.id.deleteCommentButton);
+         Button deleteButton =
+                 (Button) findViewById(R.id.deleteCommentButton);
          deleteButton.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
-                 EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                 EditText commentField =
+                         (EditText) findViewById(R.id.commentEditText);
                  Person mPerson = Person.everyone[recipient];
-                 Comment mComment = cds.getCommentForRecipient(mPerson.getEmail());
+                 Comment mComment =
+                         cds.getCommentForRecipient(mPerson.getEmail());
                  if (mComment != null) {
                      cds.deleteComment(mComment);
                      Intent i =  new Intent();
@@ -109,10 +115,29 @@ public class CommentActivity extends Activity {
                      setResult(RESULT_OK, i);
                      finish();
                  } else {
-                     Toast.makeText(CommentActivity.this, R.string.deleting_null, 
+                     Toast.makeText(CommentActivity.this,
+                             R.string.deleting_null, 
                              Toast.LENGTH_SHORT).show();
                  }
 
+             }
+         });
+         
+         Button mailButton = (Button) findViewById(R.id.mailCommentButton);
+         mailButton.setOnClickListener(new OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 Intent intent = new Intent(Intent.ACTION_SEND);
+                 intent.setType("message/rfc822");
+                 String [] emails = {Person.everyone[recipient].getEmail()};
+                 Comment mComment =
+                         cds.getCommentForRecipient(
+                                 Person.everyone[recipient].getEmail());
+                 intent.putExtra(Intent.EXTRA_EMAIL, emails);
+                 intent.putExtra(Intent.EXTRA_SUBJECT,
+                         "Comment from class feedback app");
+                 intent.putExtra(Intent.EXTRA_TEXT, mComment.getContent());
+                 startActivity(Intent.createChooser(intent, "Send Email"));
              }
          });
     }

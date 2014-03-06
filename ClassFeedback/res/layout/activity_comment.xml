@@ -41,6 +41,7 @@
             android:id="@+id/saveCommentButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="23dp"
             android:text="@string/save_button" />
 
         <Button
@@ -59,6 +60,7 @@
             android:id="@+id/cancelCommentButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="23dp"
             android:text="@string/cancel_button" />
 
         <Button
@@ -66,7 +68,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear_button" />
-
     </LinearLayout>
+    <Button 
+        android:id="@+id/mailCommentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="23dp"
+        android:text="@string/mail_comment_button" />
 
 </LinearLayout>

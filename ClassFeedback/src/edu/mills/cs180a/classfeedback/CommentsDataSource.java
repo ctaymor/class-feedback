@@ -73,6 +73,28 @@ public class CommentsDataSource {
         Log.d(TAG, "Inserted comment " + insertId + " into database.");
         return new Comment(insertId, recipient, content);
     }
+    
+    /**
+     * Updates content and recipient of the comment to the database.
+     * This is used when the content or recipient
+     * of a comment has been changed. This updates that new information to the 
+     * comment in the database. 
+     * 
+     * Note that the id cannot change.
+     * 
+     * @param comment the comment whose content and/or recipient has changed
+     */
+    void updateComment(Comment comment) {
+        if (database == null) {
+            open();
+        }
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteOpenHelper.COLUMN_RECIPIENT, comment.getRecipient());
+        values.put(MySQLiteOpenHelper.COLUMN_CONTENT, comment.getContent());
+        long insertId = database.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
+                MySQLiteOpenHelper.COLUMN_ID + " = ?", new String[] {String.valueOf(comment.getId())});
+        Log.d(TAG, "Updated comment " + insertId + " in database.");
+    }
 
     /**
      * Queries the database for all comments for the specified recipient.

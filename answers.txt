@@ -18,13 +18,17 @@ I then used code which destroyed the old data to make the upgrade, which was fru
 but I knew that I had to move on the the next bit of the body of the lab.
 
 I then had the problem of how to test my code. After 3 hours, the emulator was still in progress
-loading, so I couldn't look at the data directly. To test that the code had been emptied
-by the database upgrade, I wrote a method in CommentsDataSource which got the count of
-comments for a specific recipient, and displayed the result (just for testing purposes) in
-the EditTextView. I then clicked on people who I had previously added comments to, and checked
-that their comment count was 0. I added a comment to the user, saved it, and checked that the
-count became 1. I tried adding a second comment, saved it, and the count was still one, so
-only unique comments are being added.
+loading, so I couldn't look at the data directly.
+Testing:
+1. Wrote a method in CommentsDataSource which got the count of comments for a specific recipient,
+ and I displayed the result (just for testing purposes) in the EditTextView.
+2. Clicked on people who I had previously added comments to, and checked
+that their comment count was 0 (ie, the data was deleted)
+3. I added a comment to the user with previous comments, saved it, and checked that the
+count became 1.
+4. Tried adding a second comment, saved it, and the count was still one, so
+only unique comments are being added. (Note this test did not test if the comment was being
+saved properly, a later test caught a bug in that)
 
 Problem: Save button did not save the data.
 
@@ -47,3 +51,15 @@ I then tested it again:
 5. the new comment is displayed.
 My logging also displays that the new comment has been saved all the way to the database, as it
 is now the content of the comment even after closing and reopening the CommentActivity.
+
+Testing Cancel Button:
+1. Click on comment for person with no comments.
+2. write a comment in EditTextView.
+3. Click on cancel comment.
+4. Click on comment for that same person.
+5. Verify that they still have no comment.
+6. Click on comment for a person with comments.
+7. Write a different comment in EditTextView.
+8. Click on cancel comment.
+9. Click on comment for this same second person.
+10. Verify that their comment is the original one, not the new one.

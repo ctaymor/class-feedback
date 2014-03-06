@@ -43,6 +43,13 @@ public class CommentActivity extends Activity {
         final CommentsDataSource cds = new CommentsDataSource(this);
         cds.open();
         
+        // Show existing comments
+        EditText commentField = (EditText) findViewById(R.id.commentEditText);
+        int commentCount = cds.getCountOfCommentsForRecipient(person.getEmail(), null);
+        
+        commentField.setText(commentCount+"");
+        
+        
         // Add listeners.
         Button saveButton = (Button) findViewById(R.id.saveCommentButton);
         saveButton.setOnClickListener(new OnClickListener(){

@@ -89,6 +89,10 @@ public class CommentsDataSource {
                 projection, "recipient = \"" + recipient + "\"", null, null, null, null);
     }
 
+    int getCountOfCommentsForRecipient(String recipient, String[] projection) {
+       return getCursorForCommentsForRecipient(recipient, null).getCount();
+    }
+    
     /**
      * Queries database for all comments.
      * 
@@ -108,10 +112,10 @@ public class CommentsDataSource {
      * 
      * @return all comments in the database
      */
-    List<Comment> getAllComments(String[] projection) {
+    List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
         
-        Cursor cursor = getCursorForAllComments(projection);
+        Cursor cursor = getCursorForAllComments(null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);

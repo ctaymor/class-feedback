@@ -3,6 +3,7 @@ package edu.mills.cs180a.classfeedback;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Creates and upgrades a database for storing {@link Comment}s.
@@ -12,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "comments.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     
     /**
      * The name of the table storing comments.
@@ -53,7 +54,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE = "create table "
             + TABLE_COMMENTS + "("
             + COLUMN_ID  + " integer primary key autoincrement, "
-            + COLUMN_RECIPIENT + " text not null, "
+            + COLUMN_RECIPIENT + " text not null unique, "
             + COLUMN_CONTENT + " text not null);";
 
     public MySQLiteOpenHelper(Context context) {
@@ -67,6 +68,12 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        throw new UnsupportedOperationException("There is only one version.");
+        StringBuilder sb = new StringBuilder("Upgrading database from ");
+        sb.append(oldVersion).append(" to version ").append(newVersion);
+        sb.append("which will destroy all data.");
+        Log.w(MySQLiteOpenHelper.class.getName(), sb.toString());
+        
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
+        onCreate(db);
     }
 }

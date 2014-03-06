@@ -1,0 +1,15 @@
+It took me a little bit to figure out exactly where the SQL code was 
+being executed, and how changes to the database were made. Once I 
+figured that out, my next challenge was trying to make it work to
+keep the data when making the column unique. I got fairly stuck 
+on how to select only one unique entry. I wrote the following code
+in onUpgrade():
+    db.execSQL("ALTER TABLE TABLE_COMMENTS RENAME TO TABLE_OLD_COMMENTS");
+    onCreate(db);
+    db.execSQL("INSERT INTO TABLE_COMMENTS SELECT DISTINCT FROM TABLE_OLD_COMMENTS");
+I tried looking at using SELECT for distinct columns but I couldn't quite figure out
+how to make it work, and I decided that since it was extra credit and I'm running late, 
+as much as I wanted to figure it out, it needed to wait until I got the rest of
+the lab done. Then if I have time, I could go back and figure it out.
+My first thought was to sort them by date (ie use the most recent comment) but then I
+realized that we don't have a date column, so that wouldn't work.

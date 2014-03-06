@@ -89,7 +89,13 @@ public class CommentsDataSource {
                 projection, "recipient = \"" + recipient + "\"", null, null, null, null);
     }
 
-    int getCountOfCommentsForRecipient(String recipient, String[] projection) {
+    /**
+     * Returns a count of how many comments a user has. Used to test 
+     * that the database was successfully upgraded to unique comments.
+     * @param recipient the email address of the target of the comments
+     * @return the count of the total comments targeted to the recipient
+     */
+    int getCountOfCommentsForRecipient(String recipient) {
        return getCursorForCommentsForRecipient(recipient, null).getCount();
     }
     

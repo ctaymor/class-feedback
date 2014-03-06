@@ -2,6 +2,7 @@
 package edu.mills.cs180a.classfeedback;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 /**
  * An {@code Activity} that solicits a {@link Comment} about the specified {@link Person}.
@@ -28,7 +30,7 @@ import android.widget.ImageView;
 public class CommentActivity extends Activity {
     static final String RECIPIENT = "COMMENT_RECIPIENT";
     private int recipient;
-    String TAG = "CommentActivity";
+    private static final String TAG = "CommentActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,6 @@ public class CommentActivity extends Activity {
         EditText commentField = (EditText) findViewById(R.id.commentEditText);
         Comment comment = cds.getCommentForRecipient(person.getEmail());
         if (comment != null) {
-            Log.d(TAG, "The content of the comment for this recipient is now " + comment.getContent());
             commentField.setText(comment.getContent());
         }
             
@@ -62,18 +63,16 @@ public class CommentActivity extends Activity {
                 EditText commentField = (EditText) findViewById(R.id.commentEditText);
                 Person mPerson = Person.everyone[recipient];
                 Comment mOldComment = cds.getCommentForRecipient(mPerson.getEmail());
-                Log.d(TAG, commentField.getText().toString());
                 if (mOldComment != null) {
-                    Log.d(TAG, "reached if mOldComment is not null");
-                    Log.d(TAG, "Now setting content on mOldContent.");
                     mOldComment.setContent(commentField.getText().toString());
-                    Log.d(TAG, "mOldComment's content is now " + mOldComment.getContent());
                     cds.updateComment(mOldComment);
                 } else {
                     cds.createComment(mPerson.getEmail(), 
                             commentField.getText().toString());
                 }
-                setResult(RESULT_OK);
+                Intent i = new Intent();
+                i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
+                setResult(RESULT_OK, i);
                 finish();
             }
         });
@@ -88,12 +87,33 @@ public class CommentActivity extends Activity {
         });
         
         Button cancelButton = (Button) findViewById(R.id.cancelCommentButton);
-        cancelButton.setOnClickListener(new OnClickListener(){
+        cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 setResult(RESULT_CANCELED);
                 finish();
             }
         });
+        
+         Button deleteButton = (Button) findViewById(R.id.deleteCommentButton);
+         deleteButton.setOnClickListener(new OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                 Person mPerson = Person.everyone[recipient];
+                 Comment mComment = cds.getCommentForRecipient(mPerson.getEmail());
+                 if (mComment != null) {
+                     cds.deleteComment(mComment);
+                     Intent i =  new Intent();
+                     i.putExtra(MainActivity.SUCCESS_TYPE, "Deleted");
+                     setResult(RESULT_OK, i);
+                     finish();
+                 } else {
+                     Toast.makeText(CommentActivity.this, R.string.deleting_null, 
+                             Toast.LENGTH_SHORT).show();
+                 }
+
+             }
+         });
     }
 }

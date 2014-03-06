@@ -63,3 +63,32 @@ Testing Cancel Button:
 8. Click on cancel comment.
 9. Click on comment for this same second person.
 10. Verify that their comment is the original one, not the new one.
+
+Testing Delete:
+1. Click on comment for target recipient who has existing comment.
+2. Verify existing comment.
+3. Click delete.
+4. Click on comment for target recipient.
+5. Verify recipient now has no comment.
+6. Click on delete.
+7. Verify that program.
+
+Problem with delete:
+Because there were only two result codes, the toast said that the comment
+had been saved when the comment had actually been deleted. I needed to pass
+an extra back to MainActivity with the result. I thought it was done using
+the same intent as was passed to CommentActivity, but I was getting
+NullPointerExceptions. I did logging to isolate where the error was, and then
+realized after some trial and error and reading documentation and googling that
+I wasn't passing an intent back at all. I made a new intent in CommentActivity,
+and added it when I set the result and this fixed the problem.
+I found this stack overflow question helpful:
+http://stackoverflow.com/questions/920306/sending-data-back-to-the-main-activity-in-android
+Testing proper toasts:
+1. write in a new comment.
+2. click save.
+3. Verify that the proper "comment saved" toast pops up
+4. click comment for a recipient who has a comment.
+5. click delete.
+6. Verify that the proper "comment deleted" toast pops up.
+

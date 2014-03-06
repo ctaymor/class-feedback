@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +25,9 @@ import android.widget.Toast;
  */
 public class MainActivity extends Activity {
     private LayoutInflater mInflater;
+    static final String SUCCESS_TYPE = "RESULT_SUCCESS_TYPE";
+    private static final String TAG = "MainActivity";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +46,11 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         int resultMessageResourceId = 0;
         if (resultCode == RESULT_OK) {
-            resultMessageResourceId = R.string.comment_added;
+            if (data.getStringExtra(SUCCESS_TYPE).equals("Deleted")) {
+                resultMessageResourceId = R.string.comment_deleted;
+            } else {
+                resultMessageResourceId = R.string.comment_added;
+            }
         } else if (resultCode == RESULT_CANCELED) {
             resultMessageResourceId = R.string.comment_canceled;
         }

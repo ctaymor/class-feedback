@@ -12,4 +12,7 @@
     <string name="empty"></string>
     <string name="comment_added">Comment added</string>
     <string name="comment_canceled">Comment canceled</string>
+    <string name="delete_button">Delete</string>
+    <string name="comment_deleted">Comment deleted</string>
+    <string name="deleting_null">There is no comment to delete.</string>
 </resources>

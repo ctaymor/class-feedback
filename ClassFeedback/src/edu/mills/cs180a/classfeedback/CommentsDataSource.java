@@ -91,9 +91,25 @@ public class CommentsDataSource {
         ContentValues values = new ContentValues();
         values.put(MySQLiteOpenHelper.COLUMN_RECIPIENT, comment.getRecipient());
         values.put(MySQLiteOpenHelper.COLUMN_CONTENT, comment.getContent());
-        long insertId = database.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
-                MySQLiteOpenHelper.COLUMN_ID + " = ?", new String[] {String.valueOf(comment.getId())});
-        Log.d(TAG, "Updated comment " + insertId + " in database.");
+        long updateId = database.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
+                MySQLiteOpenHelper.COLUMN_ID + " = ?",
+                new String[] {String.valueOf(comment.getId())});
+        Log.d(TAG, "Updated comment " + updateId + " in database.");
+    }
+    
+    /**
+     * Removes a comment from the database.
+     * 
+     * @param comment the comment to be deleted
+     */
+    void deleteComment(Comment comment) {
+        if (database == null) {
+            open();
+        }
+        long deleteId = database.delete(MySQLiteOpenHelper.TABLE_COMMENTS, 
+                MySQLiteOpenHelper.COLUMN_ID + " = ?", 
+                new String[] {String.valueOf(comment.getId())});
+        Log.d(TAG, "Deleted comment " + deleteId + "from database.");
     }
 
     /**

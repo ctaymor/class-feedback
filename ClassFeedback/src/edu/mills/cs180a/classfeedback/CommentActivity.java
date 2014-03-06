@@ -2,6 +2,7 @@
 package edu.mills.cs180a.classfeedback;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,13 +44,13 @@ public class CommentActivity extends Activity {
         final CommentsDataSource cds = new CommentsDataSource(this);
         cds.open();
         
-        // Show number of comments
+        // Show comment
         EditText commentField = (EditText) findViewById(R.id.commentEditText);
-        int commentCount = cds.getCountOfCommentsForRecipient(person.getEmail());
-        
-        commentField.setText(commentCount+"");
-        
-        
+        Comment comment = cds.getCommentForRecipient(person.getEmail());
+        if (comment != null) {
+            commentField.setText(comment.getContent());
+        }
+            
         // Add listeners.
         Button saveButton = (Button) findViewById(R.id.saveCommentButton);
         saveButton.setOnClickListener(new OnClickListener(){

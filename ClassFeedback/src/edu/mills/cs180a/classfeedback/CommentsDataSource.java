@@ -92,11 +92,29 @@ public class CommentsDataSource {
     /**
      * Returns a count of how many comments a user has. Used to test 
      * that the database was successfully upgraded to unique comments.
+     * 
      * @param recipient the email address of the target of the comments
      * @return the count of the total comments targeted to the recipient
      */
     int getCountOfCommentsForRecipient(String recipient) {
        return getCursorForCommentsForRecipient(recipient, null).getCount();
+    }
+    
+    /**
+     * Retrieves the unique comment targeted to the recipient from the
+     * database
+     * 
+     * @param recipient the email address of the target of the comments
+     * @return the comment targeted to the user, null if no comments for the user
+     */
+    Comment getCommentForRecipient(String recipient) {
+        Cursor mCursor = getCursorForCommentsForRecipient(recipient, null);
+        if (mCursor.getCount() != 0) {
+            mCursor.moveToFirst();
+            return cursorToComment(mCursor);     
+        } else {
+            return null;
+        }
     }
     
     /**

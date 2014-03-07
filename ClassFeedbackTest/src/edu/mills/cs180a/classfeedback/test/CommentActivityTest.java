@@ -116,4 +116,34 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     public void testCommentEntry2() {
        testCommentEntryInternal();
     }
+    
+    @UiThreadTest
+    public void testCancelButtonWithNoComment() {
+        assertEquals(0, getNumCommentsForRecipient(RECIPIENT));
+        checkCancelDoesNotChangeComment(); 
+    }
+    
+   @UiThreadTest
+   public void testCancelButtonWithComment() {
+       mCds.createComment(RECIPIENT.getEmail(), COMMENT_TEXT);
+       checkCancelDoesNotChangeComment();
+   }
+   
+   public void checkCancelDoesNotChangeComment() {
+       // Test that comment is unchanged
+       Cursor mCursor = mCds.getCursorForCommentsForRecipient(RECIPIENT.getEmail(), null);
+       String mCommentBeforeCancel = null;
+       if (mCursor.moveToFirst()) {
+           mCommentBeforeCancel = mCursor.getString(0); 
+       };
+       mCancelButton.performClick();
+       Cursor mCursor2 = mCds.getCursorForCommentsForRecipient(RECIPIENT.getEmail(), null);
+       String mCommentAfterCancel = null;
+       if (mCursor2.moveToFirst()) {
+           mCommentAfterCancel = mCursor2.getString(0);
+       }
+       assertEquals(mCommentBeforeCancel, mCommentAfterCancel);
+       mCursor.close();
+       mCursor2.close();
+   }
 }

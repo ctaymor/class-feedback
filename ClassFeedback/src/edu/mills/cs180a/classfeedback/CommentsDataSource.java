@@ -83,7 +83,7 @@ public class CommentsDataSource {
      * @param content the content of the comment
      * @return a new {@link Comment} instance
      */
-    Comment createComment(String recipient, String content) {
+    public Comment createComment(String recipient, String content) {
         if (database == null) {
             open();
         }

@@ -1,6 +1,7 @@
 package edu.mills.cs180a.classfeedback.test;
 
 import android.content.Context;
+import edu.mills.cs180a.classfeedback.Comment;
 import edu.mills.cs180a.classfeedback.CommentsDataSource;
 
 public class MockCommentsDataSource extends CommentsDataSource {

@@ -129,6 +129,12 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
        checkCancelDoesNotChangeComment();
    }
    
+   @UiThreadTest
+   public void testCancelButtonWithUnsavedText() {
+       mCommentField.setText("I am not COMMENT_TEXT");
+       checkCancelDoesNotChangeComment();
+   }
+   
    public void checkCancelDoesNotChangeComment() {
        // Test that comment is unchanged
        Cursor mCursor = mCds.getCursorForCommentsForRecipient(RECIPIENT.getEmail(), null);

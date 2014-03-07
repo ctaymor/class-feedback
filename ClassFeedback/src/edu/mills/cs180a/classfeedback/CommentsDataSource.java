@@ -106,7 +106,7 @@ public class CommentsDataSource {
      * 
      * @param comment the comment whose content and/or recipient has changed
      */
-    void updateComment(Comment comment) {
+    protected void updateComment(Comment comment) {
         if (database == null) {
             open();
         }
@@ -124,7 +124,7 @@ public class CommentsDataSource {
      * 
      * @param comment the comment to be deleted
      */
-    void deleteComment(Comment comment) {
+    protected void deleteComment(Comment comment) {
         if (database == null) {
             open();
         }
@@ -169,7 +169,7 @@ public class CommentsDataSource {
      * @param recipient the email address of the target of the comments
      * @return the comment targeted to the user, null if no comments for the user
      */
-    Comment getCommentForRecipient(String recipient) {
+    protected Comment getCommentForRecipient(String recipient) {
         Cursor mCursor = getCursorForCommentsForRecipient(recipient, null);
         if (mCursor.getCount() != 0) {
             mCursor.moveToFirst();

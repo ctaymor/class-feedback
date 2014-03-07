@@ -30,7 +30,8 @@ import android.widget.Toast;
  * @author ctaymor@gmail.com (Caroline Taymor)
  */
 public class CommentActivity extends Activity {
-    static final String RECIPIENT = "COMMENT_RECIPIENT";
+    public static final String RECIPIENT = "COMMENT_RECIPIENT";
+    public static final String CDS_FACTORY = "CDS_FACTORY";
     private int recipient;
     private static final String TAG = "CommentActivity";
 
@@ -38,45 +39,30 @@ public class CommentActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
-        
+
         // Show a picture of the recipient.
         recipient = getIntent().getIntExtra(RECIPIENT, -1);
         assert(recipient >= 0 && recipient < Person.everyone.length);
         Person person = Person.everyone[recipient];
         ImageView icon = (ImageView) findViewById(R.id.commentImageView);
         icon.setImageResource(person.getImageId());
-        
+
         // Get a connection to the database.
-        final CommentsDataSource cds = new CommentsDataSource(this);
+        CommentsDataSourceAbstractFactory factory = 
+                (CommentsDataSourceAbstractFactory) getIntent().getSerializableExtra(CDS_FACTORY);
+        final CommentsDataSource cds = factory.createCommentsDataSource(this);
         cds.open();
-        
-        // Show comment
-        EditText commentField = (EditText) findViewById(R.id.commentEditText);
-        Comment comment = cds.getCommentForRecipient(person.getEmail());
-        if (comment != null) {
-            commentField.setText(comment.getContent());
-        }
-            
+
         // Add listeners.
         Button saveButton = (Button) findViewById(R.id.saveCommentButton);
         saveButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View view) {
-                EditText commentField =
-                        (EditText) findViewById(R.id.commentEditText);
-                Person mPerson = Person.everyone[recipient];
-                Comment mOldComment =
-                        cds.getCommentForRecipient(mPerson.getEmail());
-                if (mOldComment != null) {
-                    mOldComment.setContent(commentField.getText().toString());
-                    cds.updateComment(mOldComment);
-                } else {
-                    cds.createComment(mPerson.getEmail(), 
-                            commentField.getText().toString());
-                }
-                Intent i = new Intent();
-                i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
-                setResult(RESULT_OK, i);
+                EditText commentField = (EditText) findViewById(R.id.commentEditText);
+                cds.createComment(Person.everyone[recipient].getEmail(), 
+                        commentField.getText().toString());
+                cds.close();
+                setResult(RESULT_OK);
                 finish();
             }
         });

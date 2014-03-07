@@ -24,15 +24,24 @@ public class CommentsDataSource {
     private SQLiteDatabase database;
     private MySQLiteOpenHelper dbHelper;
 
-    /**
-     * Constructs a {@code CommentsDataSource}.  The {@link #open()} method must be
-     * called before retrieving data from this.
-     * 
-     * @param context required context for the associated {@link SQLiteDatabase}
-     */
-    public CommentsDataSource(Context context) {
+    protected CommentsDataSource(Context context) {
         dbHelper = new MySQLiteOpenHelper(context);
     }
+    
+    protected CommentsDataSource(Context context, String name) {
+        dbHelper = new MySQLiteOpenHelper(context, name);
+    }
+    
+    /**
+     * Constructs a {@code CommentsDataSource} with the specified name.  
+     * The {@link #open()} method must be called before retrieving data from this.
+     * 
+     * @param context required context for the associated {@link SQLiteDatabase}
+     * @return a source for a database with the specified context and name
+     */
+     public static CommentsDataSource create(Context context) {
+         return new CommentsDataSource(context);
+     }
 
     /**
      * Opens a connection to the database, creating it if necessary.
@@ -49,9 +58,22 @@ public class CommentsDataSource {
      * Closes the connection to the database, opened with {@link #open()}.
      */
     public void close() {
+        database.close();
         dbHelper.close();
     }
-
+    
+    /**
+     * Deletes the specified comments.
+     * 
+     * @param selection which comments to delete (as a SQL where clause), or {@code null},
+     *     to delete all comments
+     * @param selectionArgs values for arguments in {@code selection}
+     * @return the number of rows deleted
+     */
+    public int delete(String selection, String[] selectionArgs) {
+        return database.delete(MySQLiteOpenHelper.TABLE_COMMENTS, selection, selectionArgs);
+    }
+    
     /**
      * Creates a comment with the specified content for the specified recipient.
      * This both adds the comment to the database and constructs a {@link Comment}
@@ -119,8 +141,8 @@ public class CommentsDataSource {
      * @param projection the names of the columns to retrieve
      * @return a {@code Cursor} pointing to all comments for the recipient
      */
-    Cursor getCursorForCommentsForRecipient(String recipient,
-            String[] projection) {
+
+    public Cursor getCursorForCommentsForRecipient(String recipient, String[] projection) {
         if (database == null) {
             open();
         }
@@ -178,7 +200,7 @@ public class CommentsDataSource {
      */
     List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
-        
+
         Cursor cursor = getCursorForAllComments(null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -191,6 +213,8 @@ public class CommentsDataSource {
         return comments;
     }
 
+    // The cursor must have all of the columns in the default order,
+    // which happens if the cursor is created with a null projection.
     private Comment cursorToComment(Cursor cursor) {
         Comment comment = new Comment(
                 cursor.getLong(MySQLiteOpenHelper.COLUMN_ID_POS), 

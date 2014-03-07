@@ -92,3 +92,16 @@ Testing proper toasts:
 5. click delete.
 6. Verify that the proper "comment deleted" toast pops up.
 
+Testing Email:
+1. Clicked on comment for recipient with a comment
+2. Clicked on email
+3. Chose gmail to open intent in
+4. Verified that the email has the correct sender, subject and content
+5. Verify that the alert dialog box pops up
+6. Click delete.
+7. Reopen the comment activity for that recipient to verify that the comment
+was properly deleted.
+8. make and save a new comment for the recipient.
+9. Do 2-5.
+10. Click cancel.
+11. Verify that the comment was not deleted.

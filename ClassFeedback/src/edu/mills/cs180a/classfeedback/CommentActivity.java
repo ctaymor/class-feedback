@@ -2,6 +2,8 @@
 package edu.mills.cs180a.classfeedback;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -103,23 +105,7 @@ public class CommentActivity extends Activity {
          deleteButton.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
-                 EditText commentField =
-                         (EditText) findViewById(R.id.commentEditText);
-                 Person mPerson = Person.everyone[recipient];
-                 Comment mComment =
-                         cds.getCommentForRecipient(mPerson.getEmail());
-                 if (mComment != null) {
-                     cds.deleteComment(mComment);
-                     Intent i =  new Intent();
-                     i.putExtra(MainActivity.SUCCESS_TYPE, "Deleted");
-                     setResult(RESULT_OK, i);
-                     finish();
-                 } else {
-                     Toast.makeText(CommentActivity.this,
-                             R.string.deleting_null, 
-                             Toast.LENGTH_SHORT).show();
-                 }
-
+                 deleteComment(cds);
              }
          });
          
@@ -137,8 +123,55 @@ public class CommentActivity extends Activity {
                  intent.putExtra(Intent.EXTRA_SUBJECT,
                          "Comment from class feedback app");
                  intent.putExtra(Intent.EXTRA_TEXT, mComment.getContent());
-                 startActivity(Intent.createChooser(intent, "Send Email"));
+                 startActivityForResult(Intent.createChooser(intent, "Send Email"), recipient);
              }
          });
+    }
+    
+    /**
+     * Deletes a comment, finishes this activity, and passes
+     * an intent extra back indicating the success of deleting the comment.
+     * 
+     * @param cds this CommentsDataSource
+     */
+    protected void deleteComment(CommentsDataSource cds) {
+        EditText commentField =
+                (EditText) findViewById(R.id.commentEditText);
+        Person mPerson = Person.everyone[recipient];
+        Comment mComment =
+                cds.getCommentForRecipient(mPerson.getEmail());
+        if (mComment != null) {
+            cds.deleteComment(mComment);
+            Intent i =  new Intent();
+            i.putExtra(MainActivity.SUCCESS_TYPE, "Deleted");
+            setResult(RESULT_OK, i);
+            finish();
+        } else {
+            Toast.makeText(CommentActivity.this,
+                    R.string.deleting_null, 
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(CommentActivity.this);
+        builder.setMessage(R.string.do_you_want_to_delete);
+        builder.setPositiveButton(R.string.delete_button, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                final CommentsDataSource cds = new CommentsDataSource(CommentActivity.this);
+                cds.open();
+                deleteComment(cds);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        
     }
 }

@@ -43,8 +43,7 @@ public class MainActivity extends Activity {
     }
     
     @Override
-    protected void onActivityResult(int requestCode,
-            int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         int resultMessageResourceId = 0;
         if (resultCode == RESULT_OK) {
             if (data.getStringExtra(SUCCESS_TYPE).equals("Deleted")) {

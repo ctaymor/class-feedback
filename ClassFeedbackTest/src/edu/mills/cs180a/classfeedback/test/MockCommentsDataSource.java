@@ -1,5 +1,7 @@
 package edu.mills.cs180a.classfeedback.test;
 
+import java.util.Hashtable;
+
 import android.content.Context;
 import android.database.Cursor;
 import edu.mills.cs180a.classfeedback.Comment;
@@ -7,9 +9,11 @@ import edu.mills.cs180a.classfeedback.CommentsDataSource;
 
 public class MockCommentsDataSource extends CommentsDataSource {
     private static MockCommentsDataSource instance;
+    private static Hashtable mHashtable;
     
     private MockCommentsDataSource(Context context) {
         super(context, null);
+        mHashtable = new Hashtable();
     }
     
     /**
@@ -67,7 +71,6 @@ public class MockCommentsDataSource extends CommentsDataSource {
             throws UnsupportedOperationException {
         return null;
     }
-    
     
     /**
      * Resets the data source to its initial empty condition.

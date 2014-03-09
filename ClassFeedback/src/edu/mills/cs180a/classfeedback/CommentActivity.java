@@ -145,7 +145,7 @@ public class CommentActivity extends Activity {
         builder.setMessage(R.string.do_you_want_to_delete);
         builder.setPositiveButton(R.string.delete_button, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                final CommentsDataSource cds = new CommentsDataSource(CommentActivity.this);
+                final CommentsDataSource cds = CommentsDataSource.create(CommentActivity.this);
                 cds.open();
                 deleteComment(cds);
             }

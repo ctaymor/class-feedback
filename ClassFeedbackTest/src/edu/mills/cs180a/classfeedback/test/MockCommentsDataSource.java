@@ -9,11 +9,11 @@ import edu.mills.cs180a.classfeedback.CommentsDataSource;
 
 public class MockCommentsDataSource extends CommentsDataSource {
     private static MockCommentsDataSource instance;
-    private static Hashtable mHashtable;
+    private static Hashtable<String, Comment> mHashtable;
     
     private MockCommentsDataSource(Context context) {
         super(context, null);
-        mHashtable = new Hashtable();
+        mHashtable = new Hashtable<String, Comment>();
     }
     
     /**
@@ -30,7 +30,7 @@ public class MockCommentsDataSource extends CommentsDataSource {
     }
     
     @Override
-    public void open() throws UnsupportedOperationException {  
+    public void open() {  
     }
     
     
@@ -39,43 +39,33 @@ public class MockCommentsDataSource extends CommentsDataSource {
     }
     
     @Override
-    public int delete(String selection, String[] selectionArgs)
-            throws UnsupportedOperationException {
-        return 0;
+    public Comment createComment(String recipient, String content) {
+        Comment mComment = new Comment(0, recipient, content);
+        mHashtable.put(recipient, mComment);
+        return mComment;
     }
     
-    @Override
-    public Comment createComment(String recipient, String content) 
-            throws UnsupportedOperationException {
-        return null;
-    }
-    
+    // TODO Do we actually need this? Not on our list of used methods.
     @Override
     protected void updateComment(Comment comment)
             throws UnsupportedOperationException {
     }
     
     @Override
-    protected void deleteComment(Comment comment)
-            throws UnsupportedOperationException {
+    protected void deleteComment(Comment comment) {
+        mHashtable.remove(comment.getRecipient());
     }
     
     @Override
-    public Cursor getCursorForCommentsForRecipient(String recipient,
-            String[] projection) throws UnsupportedOperationException {
-        return null;
-    }
-    
-    @Override
-    protected Comment getCommentForRecipient(String recipient)
-            throws UnsupportedOperationException {
-        return null;
+    protected Comment getCommentForRecipient(String recipient) {
+        return mHashtable.get(recipient);
     }
     
     /**
      * Resets the data source to its initial empty condition.
      */
     public void reset() {
-        super.delete(null, null);
+        // super.delete(null, null);
+        mHashtable.clear();
     }
 }

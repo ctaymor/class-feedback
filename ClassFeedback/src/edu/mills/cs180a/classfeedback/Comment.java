@@ -13,7 +13,7 @@ public class Comment {
     private String mRecipient;
     private String mContent;
     
-    Comment(long id, String recipient, String content) {
+    public Comment(long id, String recipient, String content) {
         mId = id;
         mRecipient = recipient;
         mContent = content;
@@ -24,7 +24,7 @@ public class Comment {
      *
      * @return the email address of the recipient
      */
-    String getRecipient() {
+    public String getRecipient() {
         return mRecipient;
     }
     
@@ -42,7 +42,7 @@ public class Comment {
      *
      * @return the content
      */
-    String getContent() {
+    public String getContent() {
         return mContent;
     }
     

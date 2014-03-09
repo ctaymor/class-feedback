@@ -11,6 +11,7 @@ import android.test.UiThreadTest;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import edu.mills.cs180a.classfeedback.Comment;
 import edu.mills.cs180a.classfeedback.CommentActivity;
 import edu.mills.cs180a.classfeedback.MySQLiteOpenHelper;
 import edu.mills.cs180a.classfeedback.Person;
@@ -78,15 +79,13 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     }
 
     private int getNumCommentsForRecipient(Person recipient) {
-        Cursor cursor = mCds.getCursorForCommentsForRecipient(
-                recipient.getEmail(), null);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
+        if (mCds.getCommentForRecipient(recipient.getEmail()) == null ) {
+            return 0;
+        }
+        return 1;
     }
 
     private void testCommentEntryInternal() {
-        String[] desiredColumns = { MySQLiteOpenHelper.COLUMN_CONTENT };
         assertEquals("Database is not empty at beginning of test.",
                 0, getNumCommentsForRecipient(RECIPIENT));
         
@@ -94,13 +93,8 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         mCommentField.setText(COMMENT_TEXT);
         mSaveButton.performClick();
         
-        Cursor cursor = mCds.getCursorForCommentsForRecipient(
-                RECIPIENT.getEmail(), desiredColumns);
-        assertEquals(1, cursor.getCount());
-        assertTrue(cursor.moveToFirst());
-        assertEquals(COMMENT_TEXT, cursor.getString(0));
-        assertFalse(cursor.moveToNext());
-        cursor.close();
+        Comment mComment = mCds.getCommentForRecipient(RECIPIENT.getEmail());
+        assertEquals(COMMENT_TEXT, mComment.getContent());
     }
     
     // Test comment entry twice, to make sure that the database has no comments
@@ -119,6 +113,9 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     
     @UiThreadTest
     public void testCancelButtonWithNoComment() {
+        if (getNumCommentsForRecipient(RECIPIENT) != 0) {
+            mCds.deleteComment(mCds.getCommentForRecipient(RECIPIENT.getEmail()));
+        }
         assertEquals(0, getNumCommentsForRecipient(RECIPIENT));
         checkCancelDoesNotChangeComment(); 
     }
@@ -137,19 +134,9 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
    
    public void checkCancelDoesNotChangeComment() {
        // Test that comment is unchanged
-       Cursor mCursor = mCds.getCursorForCommentsForRecipient(RECIPIENT.getEmail(), null);
-       String mCommentBeforeCancel = null;
-       if (mCursor.moveToFirst()) {
-           mCommentBeforeCancel = mCursor.getString(0); 
-       };
+       Comment mCommentBeforeCancel = mCds.getCommentForRecipient(RECIPIENT.getEmail());
        mCancelButton.performClick();
-       Cursor mCursor2 = mCds.getCursorForCommentsForRecipient(RECIPIENT.getEmail(), null);
-       String mCommentAfterCancel = null;
-       if (mCursor2.moveToFirst()) {
-           mCommentAfterCancel = mCursor2.getString(0);
-       }
+       Comment mCommentAfterCancel = mCds.getCommentForRecipient(RECIPIENT.getEmail());
        assertEquals(mCommentBeforeCancel, mCommentAfterCancel);
-       mCursor.close();
-       mCursor2.close();
    }
 }

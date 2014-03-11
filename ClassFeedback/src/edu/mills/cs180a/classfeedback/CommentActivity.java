@@ -62,7 +62,9 @@ public class CommentActivity extends Activity {
                 cds.createComment(Person.everyone[recipient].getEmail(), 
                         commentField.getText().toString());
                 cds.close();
-                setResult(RESULT_OK);
+                Intent i = new Intent();
+                i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
+                setResult(RESULT_OK, i);
                 finish();
             }
         });
@@ -92,6 +94,9 @@ public class CommentActivity extends Activity {
              @Override
              public void onClick(View view) {
                  deleteComment(cds);
+                 Intent i =  new Intent();
+                 i.putExtra(MainActivity.SUCCESS_TYPE, "Deleted");
+                 setResult(RESULT_OK, i);
              }
          });
          

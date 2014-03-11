@@ -1,15 +1,22 @@
 package edu.mills.cs180a.classfeedback.test;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.test.ProviderTestCase2;
 import android.test.mock.MockContentResolver;
+import edu.mills.cs180a.classfeedback.Comment;
 import edu.mills.cs180a.classfeedback.CommentContentProvider;
+import edu.mills.cs180a.classfeedback.MySQLiteOpenHelper;
 
 // This creates an IsolatedContext and does not affect the production store.
 public class CommentContentProviderTest extends ProviderTestCase2<CommentContentProvider> {
     private MockContentResolver mResolver;
+    private static final String KEY_EMAIL = "KEY_EMAIL";
+    private static final String CONTENT = "lorem ipsum";
     private static final String EMAIL = "foo@bar.com";
+    private static final String KEY_COMMENT = "KEY_COMMENT";
+    private static final int COLUMN_CONTENT_POS = 2;
     
     public CommentContentProviderTest() {
         super(CommentContentProvider.class, CommentContentProvider.AUTHORITY);
@@ -21,12 +28,38 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         mResolver = getMockContentResolver();
     }
     
+    public void testInsertCommentForUserWithNoComment() {
+        // Test no comment yet
+        Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
+        checkNoCommentsForUser(uriOfRecipient);
+        // Test inserting new comment
+        ContentValues values = new ContentValues();
+        values.put(KEY_EMAIL, EMAIL);
+        values.put(KEY_COMMENT, CONTENT);
+        Uri uriReturned = mResolver.insert(CommentContentProvider.CONTENT_URI, values);
+        // Test comment was inserted
+        assertEquals("content://edu.mills.cs180a.classfeedback/comments/" +  EMAIL, uriReturned);
+        Cursor cursor = getCursorForCommentsForUser(uriOfRecipient);
+        assert(cursor.moveToFirst());
+        assertEquals(CONTENT, cursor.getString(COLUMN_CONTENT_POS));
+        cursor.close();
+    }
+    
+    
+    
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
-        String[] projection = { "content" };  // desired columns
-        Cursor cursor = mResolver.query(uri, projection, null, null, null);
+        checkNoCommentsForUser(uri);
+    }
+    
+    public void checkNoCommentsForUser(Uri uri) {
+        Cursor cursor = getCursorForCommentsForUser(uri);
         assertNotNull(cursor);
         assertEquals(0, cursor.getCount());
         cursor.close();
+    }
+    public Cursor getCursorForCommentsForUser(Uri uri) {
+        String[] projection = { "content" };  // desired columns
+        return mResolver.query(uri, projection, null, null, null);
     }
 }

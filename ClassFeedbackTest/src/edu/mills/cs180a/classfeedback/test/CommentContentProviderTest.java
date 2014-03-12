@@ -52,14 +52,8 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         checkCommentContentForRecipient(uriOfRecipient, CONTENT);
     }
     
-    public void makeThreeCommentsForDeleteTests(){
-        insertAComment(EMAIL, CONTENT);
-        insertAComment("bar@foo.com", CONTENT);
-        insertAComment("foobar@barfoo.com", "not CONTENT");
-    }
-    
     public void testDeleteWithCommentsUriNoSelectionCriteria() {
-        makeThreeCommentsForDeleteTests();
+        makeThreeComments();
         mResolver.delete(CommentContentProvider.CONTENT_URI, null, null);
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
@@ -69,7 +63,7 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     }
     
     public void testDeleteWithCommentsUriWithSelectionCriteria() {
-        makeThreeCommentsForDeleteTests();
+        makeThreeComments();
         // Delete comments with selection criteria
         String[] selectionArgs = { CONTENT };
         mResolver.delete(CommentContentProvider.CONTENT_URI,
@@ -90,7 +84,7 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     }
     
     public void testDeleteWithCommentsEmailUriWithoutSelectionCriteria() {
-        makeThreeCommentsForDeleteTests();
+        makeThreeComments();
         mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL), null, null);
         // Test that the comments we expected were deleted
         String[] projection = { "content" };  // desired columns
@@ -105,7 +99,7 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     }
     
     public void testDeleteWithCommentsEmailUriWithSelectionCriteria() {
-        makeThreeCommentsForDeleteTests();
+        makeThreeComments();
         // Delete comments with selection criteria
         String[] selectionArgs = { CONTENT };
         mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
@@ -125,7 +119,61 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         cursor.close();
     }
     
+    public void testUpdateWithCommentsUriWithNoSelectionArgs() {
+        makeThreeComments();
+        ContentValues values = new ContentValues();
+        values.put("CONTENT", "new content");
+        mResolver.update(CommentContentProvider.CONTENT_URI, values, null, null);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), "new content");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "bar@foo.com"), "new content");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + EMAIL), "new content");
+    }
     
+    public void testUpdateWithCommentsUriWithSelectionArgs() {
+        makeThreeComments();
+        ContentValues values = new ContentValues();
+        values.put("CONTENT", "new content");
+        String[] selectionArgs = { CONTENT };
+        mResolver.update(CommentContentProvider.CONTENT_URI, values, "CONTENT = ?", selectionArgs);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), "not CONTENT");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "bar@foo.com"), "new content");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + EMAIL), "new content");
+    }
+    
+    public void testUpdateWithEmailUriWithNoSelectionArgs() {
+        makeThreeComments();
+        ContentValues values = new ContentValues();
+        values.put("CONTENT", "new content");
+        mResolver.update(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), values, null, null);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), "new content");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "bar@foo.com"), CONTENT);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + EMAIL), CONTENT);
+    }
+    
+    public void testUpdateWithEmailUriWithSelectionArgs() {
+        makeThreeComments();
+        ContentValues values = new ContentValues();
+        values.put("CONTENT", "new content");
+        String[] selectionArgs = { "not CONTENT" };
+        mResolver.update(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), values, "CONTENT = ?", selectionArgs);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com"), "new content");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "bar@foo.com"), CONTENT);
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + EMAIL), CONTENT);
+    }
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uri);
@@ -158,4 +206,9 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         cursor.close();
     }
     
+    public void makeThreeComments(){
+        insertAComment(EMAIL, CONTENT);
+        insertAComment("bar@foo.com", CONTENT);
+        insertAComment("foobar@barfoo.com", "not CONTENT");
+    }
 }

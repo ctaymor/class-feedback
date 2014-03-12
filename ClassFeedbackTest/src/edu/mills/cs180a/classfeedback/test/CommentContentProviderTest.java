@@ -53,7 +53,29 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         assert(cursor.moveToFirst());
         assertEquals(CONTENT, cursor.getString(COLUMN_CONTENT_POS));
     }
-
+    
+    public void testDeleteWithCommentsUriNoSelectionCriteria() {
+        
+    }
+    
+    public void testDeleteWithCommentsUriWithSelectionCriteria() {
+        // Make some comments
+        insertAComment(EMAIL, CONTENT);
+        insertAComment("bar@foo.com", CONTENT);
+        insertAComment("foobar@barfoo.com", "not CONTENT");
+        // Delete comments with selection criteria
+        // Test that the comments we expected were deleted
+        // (All of them and no others)
+    }
+    
+    public void testDeleteWithCommentsEmailUriWithoutSelectionCriteria() {
+        
+    }
+    
+    public void testDeleteWithCommentsEmailUriWithSelectionCriteria() {
+        
+    }
+    
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uri);

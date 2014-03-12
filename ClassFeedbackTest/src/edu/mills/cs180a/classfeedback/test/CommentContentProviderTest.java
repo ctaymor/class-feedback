@@ -45,8 +45,6 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         cursor.close();
     }
     
-    
-    
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uri);

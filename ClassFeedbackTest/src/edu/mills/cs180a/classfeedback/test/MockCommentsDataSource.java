@@ -61,6 +61,12 @@ public class MockCommentsDataSource extends CommentsDataSource {
         return mHashtable.get(recipient);
     }
     
+    @Override
+    public Cursor getCursorForCommentsForRecipient(String recipient,
+            String[] projection) throws UnsupportedOperationException {
+                return null;
+    }
+    
     /**
      * Resets the data source to its initial empty condition.
      */

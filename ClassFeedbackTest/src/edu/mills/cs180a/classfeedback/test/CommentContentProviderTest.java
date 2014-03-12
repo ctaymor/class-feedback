@@ -32,11 +32,8 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         // Test no comment yet
         Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uriOfRecipient);
-        // Test inserting new comment
-        ContentValues values = new ContentValues();
-        values.put(KEY_EMAIL, EMAIL);
-        values.put(KEY_COMMENT, CONTENT);
-        Uri uriReturned = mResolver.insert(CommentContentProvider.CONTENT_URI, values);
+        // Insert a comment
+        Uri uriReturned = insertAComment(EMAIL, CONTENT);
         // Test comment was inserted
         assertEquals("content://edu.mills.cs180a.classfeedback/comments/" +  EMAIL, uriReturned);
         Cursor cursor = getCursorForCommentsForUser(uriOfRecipient);
@@ -45,8 +42,18 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         cursor.close();
     }
     
-    
-    
+    public void testInsertCommentForUserWithComment() {
+        Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
+        // Insert an initial comment
+        Uri uriFirstComment = insertAComment(EMAIL, CONTENT);
+        // Try to insert another comment
+        Uri uriSecondComment = insertAComment(EMAIL, "Not CONTENT");
+        assertNull(uriSecondComment);
+        Cursor cursor = getCursorForCommentsForUser(uriOfRecipient);
+        assert(cursor.moveToFirst());
+        assertEquals(CONTENT, cursor.getString(COLUMN_CONTENT_POS));
+    }
+
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uri);
@@ -61,5 +68,13 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     public Cursor getCursorForCommentsForUser(Uri uri) {
         String[] projection = { "content" };  // desired columns
         return mResolver.query(uri, projection, null, null, null);
+    }
+    
+    public Uri insertAComment(String email, String content){
+     // Test inserting new comment
+        ContentValues values = new ContentValues();
+        values.put(KEY_EMAIL, email);
+        values.put(KEY_COMMENT, content);
+        return mResolver.insert(CommentContentProvider.CONTENT_URI, values);
     }
 }

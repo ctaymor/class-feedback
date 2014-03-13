@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.test.ProviderTestCase2;
 import android.test.mock.MockContentResolver;
-import edu.mills.cs180a.classfeedback.Comment;
 import edu.mills.cs180a.classfeedback.CommentContentProvider;
-import edu.mills.cs180a.classfeedback.MySQLiteOpenHelper;
 
 // This creates an IsolatedContext and does not affect the production store.
 public class CommentContentProviderTest extends ProviderTestCase2<CommentContentProvider> {
@@ -30,20 +28,101 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     
     public void testInsertCommentForUserWithNoComment() {
         // Test no comment yet
-        Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
+        Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL);
         checkNoCommentsForUser(uriOfRecipient);
-        // Test inserting new comment
-        ContentValues values = new ContentValues();
-        values.put(KEY_EMAIL, EMAIL);
-        values.put(KEY_COMMENT, CONTENT);
-        Uri uriReturned = mResolver.insert(CommentContentProvider.CONTENT_URI, values);
+        // Insert a comment
+        Uri uriReturned = insertAComment(EMAIL, CONTENT);
         // Test comment was inserted
-        assertEquals("content://edu.mills.cs180a.classfeedback/comments/" +  EMAIL, uriReturned);
-        Cursor cursor = getCursorForCommentsForUser(uriOfRecipient);
-        assert(cursor.moveToFirst());
-        assertEquals(CONTENT, cursor.getString(COLUMN_CONTENT_POS));
+        assertEquals("content://edu.mills.cs180a.classfeedback/comments/"
+                +  EMAIL, uriReturned);
+        checkCommentContentForRecipient(uriOfRecipient, CONTENT);
+    }
+    
+    public void testInsertCommentForUserWithComment() {
+        Uri uriOfRecipient = Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL);
+        // Insert an initial comment
+        Uri uriFirstComment = insertAComment(EMAIL, CONTENT);
+        // Try to insert another comment
+        Uri uriSecondComment = insertAComment(EMAIL, "Not CONTENT");
+        assertNull(uriSecondComment);
+        checkCommentContentForRecipient(uriOfRecipient, CONTENT);
+    }
+    
+    public void makeThreeCommentsForDeleteTests(){
+        insertAComment(EMAIL, CONTENT);
+        insertAComment("bar@foo.com", CONTENT);
+        insertAComment("foobar@barfoo.com", "not CONTENT");
+    }
+    
+    public void testDeleteWithCommentsUriNoSelectionCriteria() {
+        makeThreeCommentsForDeleteTests();
+        mResolver.delete(CommentContentProvider.CONTENT_URI, null, null);
+        String[] projection = { "content" };  // desired columns
+        Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
+                projection, null, null, null);
+        assertFalse(cursor.moveToNext());
         cursor.close();
     }
+    
+    public void testDeleteWithCommentsUriWithSelectionCriteria() {
+        makeThreeCommentsForDeleteTests();
+        // Delete comments with selection criteria
+        String[] selectionArgs = { CONTENT };
+        mResolver.delete(CommentContentProvider.CONTENT_URI,
+                "CONTENT = ?", selectionArgs);
+        // Test that the comments we expected were deleted
+        String[] projection = { "content" };  // desired columns
+        Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
+                projection, "CONTENT = ?", selectionArgs, null);
+        assertFalse(cursor.moveToNext());
+        Uri foobarUri = Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + "foobar@barfoo.com");
+        checkCommentContentForRecipient(foobarUri, "not CONTENT");
+        checkNoCommentsForUser(Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + "bar@foo.com"));
+        checkNoCommentsForUser(Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL));        
+        cursor.close();
+    }
+    
+    public void testDeleteWithCommentsEmailUriWithoutSelectionCriteria() {
+        makeThreeCommentsForDeleteTests();
+        mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL), null, null);
+        // Test that the comments we expected were deleted
+        String[] projection = { "content" };  // desired columns
+        Cursor cursor = mResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL),
+                projection, null, null, null);
+        assertFalse(cursor.moveToNext());
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI +
+                "/" + "foobar@barfoo.com"), "not CONTENT");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI +
+                "/" + "bar@foo.com"), CONTENT);
+        cursor.close();
+    }
+    
+    public void testDeleteWithCommentsEmailUriWithSelectionCriteria() {
+        makeThreeCommentsForDeleteTests();
+        // Delete comments with selection criteria
+        String[] selectionArgs = { CONTENT };
+        mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL), "CONTENT = ?", selectionArgs);
+        // Test that the comments we expected were deleted
+        String[] projection = { "content" };  // desired columns
+        Cursor cursor = mResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL), projection, "CONTENT = ?", selectionArgs, null);
+        assertFalse(cursor.moveToNext());
+        Uri foobarUri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + "foobar@barfoo.com");
+        checkCommentContentForRecipient(foobarUri, "not CONTENT");
+        checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI 
+                + "/" + "bar@foo.com"), CONTENT);
+        checkNoCommentsForUser(Uri.parse(CommentContentProvider.CONTENT_URI
+                + "/" + EMAIL));
+        cursor.close();
+    }
+    
     
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
@@ -56,8 +135,25 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         assertEquals(0, cursor.getCount());
         cursor.close();
     }
+    
     public Cursor getCursorForCommentsForUser(Uri uri) {
         String[] projection = { "content" };  // desired columns
         return mResolver.query(uri, projection, null, null, null);
     }
+    
+    public Uri insertAComment(String email, String content){
+     // Test inserting new comment
+        ContentValues values = new ContentValues();
+        values.put(KEY_EMAIL, email);
+        values.put(KEY_COMMENT, content);
+        return mResolver.insert(CommentContentProvider.CONTENT_URI, values);
+    }
+    
+    public void checkCommentContentForRecipient(Uri uri, String content) {
+        Cursor cursor = getCursorForCommentsForUser(uri);
+        assert(cursor.moveToFirst());
+        assertEquals(content, cursor.getString(COLUMN_CONTENT_POS));
+        cursor.close();
+    }
+    
 }

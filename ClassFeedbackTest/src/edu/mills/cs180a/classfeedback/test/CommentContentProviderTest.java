@@ -10,10 +10,10 @@ import edu.mills.cs180a.classfeedback.CommentContentProvider;
 // This creates an IsolatedContext and does not affect the production store.
 public class CommentContentProviderTest extends ProviderTestCase2<CommentContentProvider> {
     private MockContentResolver mResolver;
-    private static final String KEY_EMAIL = "KEY_EMAIL";
+    private static final String KEY_EMAIL = "recipient";
     private static final String CONTENT = "lorem ipsum";
     private static final String EMAIL = "foo@bar.com";
-    private static final String KEY_COMMENT = "KEY_COMMENT";
+    private static final String KEY_CONTENT = "content";
     private static final int COLUMN_CONTENT_POS = 2;
     
     public CommentContentProviderTest() {
@@ -34,8 +34,7 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         // Insert a comment
         Uri uriReturned = insertAComment(EMAIL, CONTENT);
         // Test comment was inserted
-        assertEquals("content://edu.mills.cs180a.classfeedback/comments/"
-                +  EMAIL, uriReturned);
+        assertEquals(uriOfRecipient, uriReturned);
         checkCommentContentForRecipient(uriOfRecipient, CONTENT);
     }
     
@@ -45,8 +44,10 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         // Insert an initial comment
         Uri uriFirstComment = insertAComment(EMAIL, CONTENT);
         // Try to insert another comment
+        checkCommentContentForRecipient(uriOfRecipient, CONTENT);
         Uri uriSecondComment = insertAComment(EMAIL, "Not CONTENT");
-        assertNull(uriSecondComment);
+        checkCommentContentForRecipient(uriOfRecipient, CONTENT);
+        assertEquals(uriFirstComment, uriSecondComment);
         checkCommentContentForRecipient(uriOfRecipient, CONTENT);
     }
     
@@ -70,7 +71,7 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
                 projection, "CONTENT = ?", selectionArgs, null);
-        assertFalse(cursor.moveToNext());
+        assertFalse(cursor.moveToFirst());
         Uri foobarUri = Uri.parse(CommentContentProvider.CONTENT_URI
                 + "/" + "foobar@barfoo.com");
         checkCommentContentForRecipient(foobarUri, "not CONTENT");
@@ -172,9 +173,19 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         checkCommentContentForRecipient(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
                 + EMAIL), CONTENT);
     }
+    
     public void testNoCommentsForEllenAtStart() {
         Uri uri = Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL);
         checkNoCommentsForUser(uri);
+    }
+    
+    public void testQueryWithCommentsUriAndSeletionArgs() {
+        makeThreeComments();
+        String[] selectionArgs = { CONTENT };
+        Cursor mCursor = mResolver.query(CommentContentProvider.CONTENT_URI, null, "CONTENT = ?", selectionArgs, null);
+        assertTrue(mCursor.moveToFirst());
+        assertEquals(CONTENT, mCursor.getString(COLUMN_CONTENT_POS));
+        assertEquals(2, mCursor.getCount());
     }
     
     public void checkNoCommentsForUser(Uri uri) {
@@ -193,14 +204,15 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
      // Test inserting new comment
         ContentValues values = new ContentValues();
         values.put(KEY_EMAIL, email);
-        values.put(KEY_COMMENT, content);
+        values.put(KEY_CONTENT, content);
         return mResolver.insert(CommentContentProvider.CONTENT_URI, values);
     }
     
     public void checkCommentContentForRecipient(Uri uri, String content) {
         Cursor cursor = getCursorForCommentsForUser(uri);
-        assert(cursor.moveToFirst());
-        assertEquals(content, cursor.getString(COLUMN_CONTENT_POS));
+        assertTrue(cursor.moveToFirst());
+        assertEquals(1, cursor.getCount());
+        assertEquals(content, cursor.getString(0));
         cursor.close();
     }
     public void makeThreeComments(){

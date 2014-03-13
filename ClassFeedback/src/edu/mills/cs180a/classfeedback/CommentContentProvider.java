@@ -3,8 +3,10 @@ package edu.mills.cs180a.classfeedback;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
@@ -24,6 +26,7 @@ public class CommentContentProvider extends ContentProvider {
     private static final String BASE_PATH = "comments";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
+
 
     // Set up URI matching.
     private static final int COMMENTS = 1;
@@ -46,17 +49,21 @@ public class CommentContentProvider extends ContentProvider {
             String sortOrder) {
         Log.d(TAG, "In CommentContentProvider.query()");
         Log.d(TAG, "In CommentContentProvider, getContext().toString(): " + getContext().toString());
-        CommentsDataSource cds = new CommentsDataSource(getContext());
-        cds.open();
+        Context context = this.getContext();
+        MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(context);
+        SQLiteDatabase readableDatabase = dbHelper.getReadableDatabase();
         Cursor cursor = null;
         switch (sURIMatcher.match(uri)) {
             case COMMENTS:
                 Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS");
-                cursor = cds.getCursorForAllComments(projection);
+                cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                        projection, null, null, null, null, null);
                 break;
             case COMMENTS_EMAIL:
                 Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS_EMAIL");
-                cursor = cds.getCursorForCommentsForRecipient(uri.getLastPathSegment(), projection);
+                cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                        projection, "recipient = \"" + uri.getLastPathSegment() +
+                        "\"", null, null, null, null);
                 break;
             default:
                 Log.d(TAG, "In CommentContentProvider.query(), uri is not matched: " + uri);
@@ -64,7 +71,6 @@ public class CommentContentProvider extends ContentProvider {
         }
         // Notify anyone listening on the URI.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
-
         return cursor;
     }
 

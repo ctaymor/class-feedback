@@ -55,20 +55,31 @@ public class CommentContentProvider extends ContentProvider {
         SQLiteDatabase readableDatabase = dbHelper.getReadableDatabase();
         Cursor cursor = null;
         switch (sURIMatcher.match(uri)) {
-            case COMMENTS:
-                Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS");
+        case COMMENTS:
+            Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS");
+            cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                    projection, selection, selectionArgs, null, null, null);
+            break;
+        case COMMENTS_EMAIL:
+            Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS_EMAIL");
+            if (selectionArgs != null) {
+                StringBuilder sb = new StringBuilder("recipient = \"");
+                sb.append(uri.getLastPathSegment()).append("\"");
+                String[] actualSelectionArgs = new String[selectionArgs.length + 1];
+                System.arraycopy(selectionArgs, 0, actualSelectionArgs, 0, selectionArgs.length);
+                actualSelectionArgs[selectionArgs.length] = sb.toString();
                 cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                        projection, null, null, null, null, null);
-                break;
-            case COMMENTS_EMAIL:
-                Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS_EMAIL");
+                        projection, selection + " AND recipient = ?", selectionArgs, 
+                        null, null, null);
+            } else {
                 cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                         projection, "recipient = \"" + uri.getLastPathSegment() +
                         "\"", null, null, null, null);
-                break;
-            default:
-                Log.d(TAG, "In CommentContentProvider.query(), uri is not matched: " + uri);
-                throw new IllegalArgumentException("Illegal uri: " + uri);
+            }
+            break;
+        default:
+            Log.d(TAG, "In CommentContentProvider.query(), uri is not matched: " + uri);
+            throw new IllegalArgumentException("Illegal uri: " + uri);
         }
         // Notify anyone listening on the URI.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -84,22 +95,30 @@ public class CommentContentProvider extends ContentProvider {
         SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
         int intToReturn = 0;
         switch (sURIMatcher.match(uri)) {
-            case COMMENTS:
-                Log.d(TAG, "In CommentContentProvider.delete(), uri is COMMENTS");
-                intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
-                        selection, selectionArgs);
-                break;
-            case COMMENTS_EMAIL:
-                Log.d(TAG, "In CommentContentProvider.delete(), uri is COMMENTS_EMAIL");
+        case COMMENTS:
+            Log.d(TAG, "In CommentContentProvider.delete(), uri is COMMENTS");
+            intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
+                    selection, selectionArgs);
+            break;
+        case COMMENTS_EMAIL:
+            Log.d(TAG, "In CommentContentProvider.delete(), uri is COMMENTS_EMAIL");
+            if (selectionArgs != null) {
                 StringBuilder sb = new StringBuilder("recipient = \"");
                 sb.append(uri.getLastPathSegment()).append("\"");
-                selectionArgs[selectionArgs.length] = sb.toString();
+                String[] actualSelectionArgs = new String[selectionArgs.length + 1];
+                System.arraycopy(selectionArgs, 0, actualSelectionArgs, 0, selectionArgs.length);
+                actualSelectionArgs[selectionArgs.length] = sb.toString();
                 intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
                         selection + " AND recipient = ?", selectionArgs);
-                break;
-            default:
-                Log.d(TAG, "In CommentContentProvider.delete(), uri is not matched: " + uri);
-                throw new IllegalArgumentException("Illegal uri: " + uri);
+            } else {
+                intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
+                        "recipient = \"" + uri.getLastPathSegment() + "\"", null);
+            }
+
+            break;
+        default:
+            Log.d(TAG, "In CommentContentProvider.delete(), uri is not matched: " + uri);
+            throw new IllegalArgumentException("Illegal uri: " + uri);
         }
         return intToReturn;
     }
@@ -107,24 +126,33 @@ public class CommentContentProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (sURIMatcher.match(uri)) {
-            case COMMENTS_EMAIL:
-            case COMMENTS:
-                return ContentResolver.CURSOR_DIR_BASE_TYPE;
-            default:
-                Log.e(TAG, "Unrecognized uri: " + uri);
-                return null;
+        case COMMENTS_EMAIL:
+        case COMMENTS:
+            return ContentResolver.CURSOR_DIR_BASE_TYPE;
+        default:
+            Log.e(TAG, "Unrecognized uri: " + uri);
+            return null;
         }
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        final String KEY_EMAIL = "KEY_EMAIL";
-        final String KEY_COMMENT = "KEY_COMMENT";
         Log.d(TAG, "In CommentContentProvider.insert()");
         Log.d(TAG, "In CommentContentProvider, getContext().toString(): " + getContext().toString());
-        MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(this.getContext());
-        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
-        dbHelper.insert(MySQLiteOpenHelper.TABLE_COMMENTS, null, values);
+        switch (sURIMatcher.match(uri)) {
+        case COMMENTS_EMAIL:
+        case COMMENTS:
+            MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(this.getContext());
+            SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+            long returnFromInsert = writableDatabase.insert(MySQLiteOpenHelper.TABLE_COMMENTS, null, values);
+            Log.d(TAG, "insert return" + returnFromInsert);
+            Log.d(TAG, "values recipient is " + values.getAsString("recipient"));
+            Log.d(TAG, "uri recipient is " + CommentContentProvider.CONTENT_URI + "/" + values.getAsString("recipient"));
+            return Uri.parse(CommentContentProvider.CONTENT_URI + "/" + values.getAsString("recipient"));
+        default:
+            Log.e(TAG, "Unrecognized uri: " + uri);
+            return null;
+        }
     }
 
     @Override

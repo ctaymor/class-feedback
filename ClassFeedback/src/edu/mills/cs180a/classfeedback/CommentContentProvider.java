@@ -44,7 +44,6 @@ public class CommentContentProvider extends ContentProvider {
         return false;
     }
 
-    // TODO need to test. Also does it handle selections?
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -182,7 +181,6 @@ public class CommentContentProvider extends ContentProvider {
                 intToReturn = writableDatabase.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
                         "recipient = \"" + uri.getLastPathSegment() + "\"", null);
             }
-
             break;
         default:
             Log.d(TAG, "In CommentContentProvider.delete(), uri is not matched: " + uri);

@@ -179,13 +179,23 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         checkNoCommentsForUser(uri);
     }
     
-    public void testQueryWithCommentsUriAndSeletionArgs() {
+    public void testQueryWithCommentsUriAndSelectionArgs() {
         makeThreeComments();
         String[] selectionArgs = { CONTENT };
         Cursor mCursor = mResolver.query(CommentContentProvider.CONTENT_URI, null, "CONTENT = ?", selectionArgs, null);
         assertTrue(mCursor.moveToFirst());
         assertEquals(CONTENT, mCursor.getString(COLUMN_CONTENT_POS));
         assertEquals(2, mCursor.getCount());
+    }
+    
+    public void testQueryWithEmailUriAndSelectionArgs() {
+        makeThreeComments();
+        String[] selectionArgs = {CONTENT};
+        Cursor mCursor = mResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI + "/" 
+                + EMAIL), null, "CONTENT = ?", selectionArgs, null);
+        assertTrue(mCursor.moveToFirst());
+        assertEquals(CONTENT, mCursor.getString(COLUMN_CONTENT_POS));
+        assertEquals(1, mCursor.getCount());
     }
     
     public void checkNoCommentsForUser(Uri uri) {

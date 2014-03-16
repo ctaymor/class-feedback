@@ -63,14 +63,17 @@ public class CommentContentProvider extends ContentProvider {
         case COMMENTS_EMAIL:
             Log.d(TAG, "In CommentContentProvider.query(), uri is COMMENTS_EMAIL");
             if (selectionArgs != null) {
-                StringBuilder sb = new StringBuilder("recipient = \"");
-                sb.append(uri.getLastPathSegment()).append("\"");
                 String[] actualSelectionArgs = new String[selectionArgs.length + 1];
                 System.arraycopy(selectionArgs, 0, actualSelectionArgs, 0, selectionArgs.length);
-                actualSelectionArgs[selectionArgs.length] = sb.toString();
-                cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
-                        projection, selection + " AND recipient = ?", selectionArgs, 
+                actualSelectionArgs[selectionArgs.length] = uri.getLastPathSegment();
+               Log.d(TAG, "selection statement for query is: " + selection + " AND recipient = ?");
+               for (int i = 0; i < actualSelectionArgs.length; i++) {
+                   Log.d(TAG, "selection statement: ith element is " + actualSelectionArgs[i]);
+               }
+               cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
+                        projection, selection + "AND recipient = ?", actualSelectionArgs, 
                         null, null, null);
+               Log.d(TAG, "cursor length from query with selection statement is: " + cursor.getCount());
             } else {
                 cursor = readableDatabase.query(MySQLiteOpenHelper.TABLE_COMMENTS,
                         projection, "recipient = \"" + uri.getLastPathSegment() +
@@ -103,13 +106,11 @@ public class CommentContentProvider extends ContentProvider {
         case COMMENTS_EMAIL:
             Log.d(TAG, "In CommentContentProvider.delete(), uri is COMMENTS_EMAIL");
             if (selectionArgs != null) {
-                StringBuilder sb = new StringBuilder("recipient = \"");
-                sb.append(uri.getLastPathSegment()).append("\"");
                 String[] actualSelectionArgs = new String[selectionArgs.length + 1];
                 System.arraycopy(selectionArgs, 0, actualSelectionArgs, 0, selectionArgs.length);
-                actualSelectionArgs[selectionArgs.length] = sb.toString();
+                actualSelectionArgs[selectionArgs.length] = uri.getLastPathSegment();
                 intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
-                        selection + " AND recipient = ?", selectionArgs);
+                        selection + " AND recipient = ?", actualSelectionArgs);
             } else {
                 intToReturn = writableDatabase.delete(MySQLiteOpenHelper.TABLE_COMMENTS,
                         "recipient = \"" + uri.getLastPathSegment() + "\"", null);

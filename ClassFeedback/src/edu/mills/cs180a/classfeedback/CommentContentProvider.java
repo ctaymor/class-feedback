@@ -158,6 +158,36 @@ public class CommentContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedOperationException("update not supported");
+        Log.d(TAG, "In CommentContentProvider.update()");
+        Log.d(TAG, "In CommentContentProvider, getContext().toString(): " + getContext().toString());
+        Context context = this.getContext();
+        MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(context);
+        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+        int intToReturn = 0;
+        switch (sURIMatcher.match(uri)) {
+        case COMMENTS:
+            Log.d(TAG, "In CommentContentProvider.update(), uri is COMMENTS");
+            intToReturn = writableDatabase.update(MySQLiteOpenHelper.TABLE_COMMENTS,
+                    values, selection, selectionArgs);
+            break;
+        case COMMENTS_EMAIL:
+            Log.d(TAG, "In CommentContentProvider.update(), uri is COMMENTS_EMAIL");
+            if (selectionArgs != null) {
+                String[] actualSelectionArgs = new String[selectionArgs.length + 1];
+                System.arraycopy(selectionArgs, 0, actualSelectionArgs, 0, selectionArgs.length);
+                actualSelectionArgs[selectionArgs.length] = uri.getLastPathSegment();
+                intToReturn = writableDatabase.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
+                        selection + " AND recipient = ?", actualSelectionArgs);
+            } else {
+                intToReturn = writableDatabase.update(MySQLiteOpenHelper.TABLE_COMMENTS, values,
+                        "recipient = \"" + uri.getLastPathSegment() + "\"", null);
+            }
+
+            break;
+        default:
+            Log.d(TAG, "In CommentContentProvider.delete(), uri is not matched: " + uri);
+            throw new IllegalArgumentException("Illegal uri: " + uri);
+        }
+        return intToReturn;
     }
 }

@@ -53,7 +53,8 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     
     public void testDeleteWithCommentsUriNoSelectionCriteria() {
         makeThreeComments();
-        mResolver.delete(CommentContentProvider.CONTENT_URI, null, null);
+        int intReturnedFromDelete = mResolver.delete(CommentContentProvider.CONTENT_URI, null, null);
+        assertEquals(3, intReturnedFromDelete);
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
                 projection, null, null, null);
@@ -65,8 +66,9 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         makeThreeComments();
         // Delete comments with selection criteria
         String[] selectionArgs = { CONTENT };
-        mResolver.delete(CommentContentProvider.CONTENT_URI,
+        int intReturnedFromDelete = mResolver.delete(CommentContentProvider.CONTENT_URI,
                 "CONTENT = ?", selectionArgs);
+        assertEquals(2, intReturnedFromDelete);
         // Test that the comments we expected were deleted
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(CommentContentProvider.CONTENT_URI,
@@ -84,8 +86,9 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
     
     public void testDeleteWithCommentsEmailUriWithoutSelectionCriteria() {
         makeThreeComments();
-        mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL), null, null);
+        int intReturnedFromDelete = mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL), null, null);
         // Test that the comments we expected were deleted
+        assertEquals(1, intReturnedFromDelete);
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI + "/" + EMAIL),
                 projection, null, null, null);
@@ -101,8 +104,9 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         makeThreeComments();
         // Delete comments with selection criteria
         String[] selectionArgs = { CONTENT };
-        mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
+        int intReturnedFromDelete = mResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
                 + "/" + EMAIL), "CONTENT = ?", selectionArgs);
+        assertEquals(1, intReturnedFromDelete);
         // Test that the comments we expected were deleted
         String[] projection = { "content" };  // desired columns
         Cursor cursor = mResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
@@ -116,6 +120,10 @@ public class CommentContentProviderTest extends ProviderTestCase2<CommentContent
         checkNoCommentsForUser(Uri.parse(CommentContentProvider.CONTENT_URI
                 + "/" + EMAIL));
         cursor.close();
+    }
+    public void testDeleteReturns0WithNoComments(){
+        int intReturnedFromDelete = mResolver.delete(CommentContentProvider.CONTENT_URI, null, null);
+        assertEquals(0, intReturnedFromDelete);
     }
     
     public void testUpdateWithCommentsUriWithNoSelectionArgs() {

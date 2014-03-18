@@ -17,4 +17,5 @@
     <string name="deleting_null">There is no comment to delete.</string>
     <string name="mail_comment_button">Mail</string>
     <string name="do_you_want_to_delete">Would you like to delete this comment?</string>
+    <string name="mailing_null">There is no comment for this user to mail.</string>
 </resources>

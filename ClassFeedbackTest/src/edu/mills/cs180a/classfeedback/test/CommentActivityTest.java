@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.mills.cs180a.classfeedback.test;
 
 import android.annotation.SuppressLint;
@@ -56,7 +53,6 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         ccp = new CommentContentProvider();
         RenamingDelegatingContext delegContext = new RenamingDelegatingContext(mActivity, "test.");
         ccp.attachInfo(delegContext, null);
-
         mResolver.addProvider(CommentContentProvider.AUTHORITY, ccp);
         
         // Initialize references to views.

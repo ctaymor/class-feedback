@@ -40,7 +40,6 @@ public class CommentActivity extends Activity {
     private ContentResolver mContentResolver;
     private static final String TAG = "CommentActivity";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -66,6 +66,7 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
         mCancelButton = (Button) mActivity.findViewById(R.id.cancelCommentButton);
     }
     
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

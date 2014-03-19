@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.IsolatedContext;
+import android.test.RenamingDelegatingContext;
 import android.test.UiThreadTest;
 import android.test.mock.MockContentResolver;
 import android.widget.Button;
@@ -32,26 +34,30 @@ public class CommentActivityTest extends ActivityInstrumentationTestCase2<Commen
     private Button mSaveButton;
     private Button mCancelButton;
     private MockContentResolver mResolver;
+    private CommentContentProvider ccp;
     private static final String TAG = "CommentActivityTest";
 
     public CommentActivityTest() {
         super(CommentActivity.class);
     }
 
-    @SuppressLint("NewApi")
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        CommentContentProvider ccp = new CommentContentProvider();
-        mResolver = new MockContentResolver(mActivity);
-        mResolver.addProvider(CommentContentProvider.AUTHORITY, ccp);
 
         Intent i = new Intent();
         setActivityInitialTouchMode(true);
         i.putExtra(CommentActivity.RECIPIENT, RECIPIENT_INDEX);
+        i.putExtra("DEBUG", true);
         setActivityIntent(i);
         // This must occur after setting the touch mode and intent.
         mActivity = getActivity();
+        mResolver = new MockContentResolver();
+        ccp = new CommentContentProvider();
+        RenamingDelegatingContext delegContext = new RenamingDelegatingContext(mActivity, "test.");
+        ccp.attachInfo(delegContext, null);
+
+        mResolver.addProvider(CommentContentProvider.AUTHORITY, ccp);
         
         // Initialize references to views.
         mImageView = (ImageView) mActivity.findViewById(R.id.commentImageView);

@@ -3,12 +3,15 @@ package edu.mills.cs180a.classfeedback;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.test.RenamingDelegatingContext;
+import android.test.mock.MockContentResolver;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,11 +37,23 @@ import android.widget.Toast;
 public class CommentActivity extends Activity {
     public static final String RECIPIENT = "COMMENT_RECIPIENT";
     private int recipient;
+    private ContentResolver mContentResolver;
     private static final String TAG = "CommentActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if  (getIntent().getBooleanExtra("DEBUG", false)) {
+            mContentResolver = new MockContentResolver();
+            CommentContentProvider ccp = new CommentContentProvider();
+            RenamingDelegatingContext delegContext = new RenamingDelegatingContext(this, "test.");
+            ccp.attachInfo(delegContext, null);
+            ((MockContentResolver) mContentResolver).addProvider(CommentContentProvider.AUTHORITY, ccp);
+        } else {
+            mContentResolver = getContentResolver();
+        }      
+        
         setContentView(R.layout.activity_comment);
 
         // Show a picture of the recipient.
@@ -52,7 +67,7 @@ public class CommentActivity extends Activity {
         EditText commentField =
                 (EditText) findViewById(R.id.commentEditText);
         Cursor mCursorOfExistingComment =
-                getContentResolver().query(Uri.parse(CommentContentProvider.CONTENT_URI
+                mContentResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
                 + "/" + person.getEmail()), null, null, null, null);
         Comment mExistingComment;
         if (mCursorOfExistingComment.moveToFirst()) {
@@ -71,7 +86,7 @@ public class CommentActivity extends Activity {
                 ContentValues values = new ContentValues();
                 values.put("recipient", mRecipientEmail);
                 values.put("content", commentField.getText().toString());
-                getContentResolver().insert(Uri.parse(CommentContentProvider.CONTENT_URI
+                mContentResolver.insert(Uri.parse(CommentContentProvider.CONTENT_URI
                         + "/" + mRecipientEmail), values);
                 Intent i = new Intent();
                 i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
@@ -116,7 +131,7 @@ public class CommentActivity extends Activity {
                  intent.setType("message/rfc822");
                  String [] emails = {Person.everyone[recipient].getEmail()};
                  String mRecipientEmail = Person.everyone[recipient].getEmail();
-                 Cursor cursor = getContentResolver().query(Uri.parse(CommentContentProvider.CONTENT_URI
+                 Cursor cursor = mContentResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
                          + "/" + mRecipientEmail), null, null, null, null);
                  //Expect only one comment returned (because unique comments for recipient
                  if (cursor.moveToFirst()) {
@@ -142,7 +157,7 @@ public class CommentActivity extends Activity {
     protected void deleteComment() {
         Person mPerson = Person.everyone[recipient];
         int deleteSuccessIndicator = 
-                getContentResolver().delete(Uri.parse(CommentContentProvider.CONTENT_URI
+                mContentResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
                         + "/" + mPerson.getEmail()), null, null);
         if (deleteSuccessIndicator == 1) {
             Intent i =  new Intent();

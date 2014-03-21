@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
     
     private class PersonArrayAdapter extends ArrayAdapter<Person> {
         PersonArrayAdapter() {
-            super(MainActivity.this, R.layout.row,
+            super(MainActivity.this, R.layout.fragment_class_list_row,
                     R.id.rowTextView, Person.everyone);
         }
 
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
             // Handling click events from a row inside a ListView gets very strange.
             // Solution found at "http://stackoverflow.com/questions/1821871".
             if (null == convertView) {
-                convertView = mInflater.inflate(R.layout.row, null);
+                convertView = mInflater.inflate(R.layout.fragment_class_list_row, null);
             }
             Button button = (Button) convertView.findViewById(R.id.rowButtonView);
             button.setOnClickListener(new OnItemClickListener(position));

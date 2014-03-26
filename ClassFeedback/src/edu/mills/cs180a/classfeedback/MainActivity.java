@@ -1,19 +1,12 @@
 
 package edu.mills.cs180a.classfeedback;
 import android.app.Activity;
-import android.content.Context;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 /**
@@ -23,75 +16,59 @@ import android.widget.Toast;
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */
-public class MainActivity extends Activity {
-    private LayoutInflater mInflater;
-    static final String SUCCESS_TYPE = "RESULT_SUCCESS_TYPE";
+public class MainActivity extends Activity implements ClassListFragment.OnCommentClickedListener {
     private static final String TAG = "MainActivity";
+    private static final int MIN_MULTIPANE_WIDTH = 700;
+    static final String SUCCESS_TYPE = "RESULT_SUCCESS_TYPE";
+    private FragmentManager fragmentManager;
+    private Fragment classListFragment;
+    private Fragment commentFragment;
+    private boolean multiPane;
+    private ContentResolver mContentResolver;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContentResolver = getContentResolver();
         
-        // Populate a list from Person.everyone.
-        ArrayAdapter<Person> adapter = new PersonArrayAdapter();
-        ListView listView = (ListView) findViewById(R.id.listView1);
-        listView.setAdapter(adapter);
+        fragmentManager = getFragmentManager();
+        classListFragment = fragmentManager.findFragmentById(R.id.listFragment);
+        commentFragment = fragmentManager.findFragmentById(R.id.commentFragment);
         
-        // Initialize mInflater, which is needed in PersonArrayAdapter.getView().
-        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-    
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        int resultMessageResourceId = 0;
-        if (resultCode == RESULT_OK) {
-            if (data.getStringExtra(SUCCESS_TYPE).equals("Deleted")) {
-                resultMessageResourceId = R.string.comment_deleted;
-            } else {
-                resultMessageResourceId = R.string.comment_added;
-            }
-        } else if (resultCode == RESULT_CANCELED) {
-            resultMessageResourceId = R.string.comment_canceled;
+        // Determine whether to use single or multiple panes.
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics(); 
+        float screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
+        float screenHeightDp = displayMetrics.heightPixels / displayMetrics.density;
+        multiPane = screenWidthDp >= MIN_MULTIPANE_WIDTH;
+        
+        // TODO: Handle rotation
+        fragmentManager.beginTransaction()
+        .hide(commentFragment)
+        .commit();
         }
-        Toast.makeText(MainActivity.this,
-                resultMessageResourceId, Toast.LENGTH_SHORT).show();
-    }
     
-    private class OnItemClickListener implements OnClickListener{       
-        private int mPosition;
-        OnItemClickListener(int position) {
-            mPosition = position;
+    // @Override
+    public void onCommentClicked(int recipient) {
+        assert(recipient >= 0 && recipient < Person.everyone.length);
+        // If we're in multi-pane mode, show the detail pane if it isn't already visible.
+        if (multiPane && commentFragment.isHidden()) {
+            fragmentManager.beginTransaction()
+            .show(commentFragment)
+            .addToBackStack(null)
+            .commit();
         }
-        @Override
-        public void onClick(View arg0) {
-            Intent i = new Intent(MainActivity.this, CommentActivity.class);
-            i.putExtra(CommentActivity.RECIPIENT, mPosition);
-            startActivityForResult(i, mPosition);
-        }       
+        // If we're in single-pane mode, show the detail panel and hide the overview list.
+        else if (!multiPane) {
+            fragmentManager.beginTransaction()
+            .show(commentFragment)
+            .hide(classListFragment)
+            .addToBackStack(null)
+            .commit();
+        }
+        // Show the current story.
+        ((CommentFragment) commentFragment).setCommentPane(recipient,
+                mContentResolver, multiPane);
     }
-    
-    private class PersonArrayAdapter extends ArrayAdapter<Person> {
-        PersonArrayAdapter() {
-            super(MainActivity.this, R.layout.fragment_class_list_row,
-                    R.id.rowTextView, Person.everyone);
-        }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Handling click events from a row inside a ListView gets very strange.
-            // Solution found at "http://stackoverflow.com/questions/1821871".
-            if (null == convertView) {
-                convertView = mInflater.inflate(R.layout.fragment_class_list_row, null);
-            }
-            Button button = (Button) convertView.findViewById(R.id.rowButtonView);
-            button.setOnClickListener(new OnItemClickListener(position));
-            Person person = getItem(position);
-            ImageView icon = (ImageView) convertView.findViewById(R.id.rowImageView);
-            icon.setImageResource(person.getImageId());
-            TextView name = (TextView) convertView.findViewById(R.id.rowTextView);
-            name.setText(person.getFirstName());
-            return convertView;
-        }
-    }
 }

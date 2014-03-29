@@ -68,6 +68,12 @@ public class ClassListFragment extends Fragment {
         }
     }
     
+    private class ViewHolder {
+        ImageView icon;
+        TextView name;
+        Button commentB;
+    }
+    
     private class PersonArrayAdapter extends ArrayAdapter<Person> {
         protected static final String TAG = "PERSON_ARRAY_ADAPTER";
 
@@ -75,23 +81,31 @@ public class ClassListFragment extends Fragment {
             super(context, R.layout.fragment_class_list_row,
                     R.id.rowTextView, Person.everyone);
         }
-
+        
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Handling click events from a row inside a ListView gets very strange.
             // Solution found at "http://stackoverflow.com/questions/1821871".
+            ViewHolder holder;
             if (null == convertView) {
                 convertView = mInflater.inflate(R.layout.fragment_class_list_row, null);
+                
+                holder = new ViewHolder();
+                holder.icon = (ImageView) convertView.findViewById(R.id.rowImageView);
+                holder.name = (TextView) convertView.findViewById(R.id.rowTextView);
+                holder.commentB = (Button) convertView.findViewById(R.id.rowButtonView);
+                
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
             }
-            Person person = getItem(position);
-            ImageView icon = (ImageView) convertView.findViewById(R.id.rowImageView);
-            icon.setImageResource(person.getImageId());
-            TextView name = (TextView) convertView.findViewById(R.id.rowTextView);
-            name.setText(person.getFirstName());
             
-            Button button = (Button) convertView.findViewById(R.id.rowButtonView);
-            button.setTag(person);
-            button.setOnClickListener(new OnClickListener() {
+            Person person = getItem(position);
+            holder.icon.setImageResource(person.getImageId());
+            holder.name.setText(person.getFirstName());
+
+            holder.commentB.setTag(person);
+            holder.commentB.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick (View view) {
                     Person person = (Person) view.getTag();

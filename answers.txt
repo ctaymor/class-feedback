@@ -29,6 +29,15 @@ person inside the click listener. I found the documentation for the get
 and set tag methods in Android's View class (inherited by ListView, Button,
 etc)
 http://developer.android.com/reference/android/view/View.html#setTag(java.lang.Object)
-It also took a little playing around to figure out which view to attach the tag to.
+It also took a little playing around to figure out which view to 
+attach the tag to.
 
-I also learned that it is more efficient to use a ViewHolder for this.
+I also learned that it is more efficient to use a ViewHolder
+pattern for ListViews. I ran into this idea all over the place,
+but this was a good resource for both understanding why it is
+important and how to implement it. I used their first example
+of how to use the design pattern (with a class ViewHolder) instead
+of the second implementation (with a new layout class ListRow) because
+I wasn't sure how to implement ListRow in the xml, and wanted to first
+complete the rest of the lab before coming back to that if I had time.
+http://sriramramani.wordpress.com/2012/07/25/infamous-viewholder-pattern/

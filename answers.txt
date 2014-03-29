@@ -1,0 +1,34 @@
+Problem:
+When I clicked on the comment button for, say, Christie, Colin's
+comment fragment would show up. It appeared somewhat random 
+who showed up, although there was some correlation to whose 
+row was at the very bottom. That was not always the case 
+however.
+
+Solution:
+After much stackoverflow and google research, I figured out that
+the problem was how ListView works. The rows are created only for
+the visible rows, to save memory, and as one scrolls, other rows
+are created (and recycled) as needed. In order to pass the 
+variable into the inner class of the click listener not as a 
+parameter, I made a variable which was declared in the class.
+This meant that each time a row was generated, that variable 
+changed to the newest person whose row had been created, but 
+accessing it from the click listener gave me the wrong person.
+I then knew what was the real problem.
+
+After a lot of reading about what was really going on, this stack
+overflow helped me get an idea of what the solution was, although
+it was less than helpful in how to implement it.
+http://stackoverflow.com/questions/19776755/ 
+The solution I used turned out to be adding a tag to the button
+object with the parameter of the person whose row it was, and then
+in the click listener, calling the getTag method on the view which
+the click listener gets passed in. That way, I had access to the proper
+person inside the click listener. I found the documentation for the get
+and set tag methods in Android's View class (inherited by ListView, Button,
+etc)
+http://developer.android.com/reference/android/view/View.html#setTag(java.lang.Object)
+It also took a little playing around to figure out which view to attach the tag to.
+
+I also learned that it is more efficient to use a ViewHolder for this.

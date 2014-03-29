@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -49,8 +50,12 @@ public class MainActivity extends Activity implements ClassListFragment.OnCommen
         }
     
     // @Override
-    public void onCommentClicked(int recipient) {
-        assert(recipient >= 0 && recipient < Person.everyone.length);
+    public void onCommentClicked(Person person) {
+        //Log.d(TAG, "nowtesting: onCommentClicked with recipient " + recipient);
+        //assert(recipient >= 0 && recipient < Person.everyone.length);
+        // Show the current story.
+        ((CommentFragment) commentFragment).setCommentPane(person,
+                mContentResolver, multiPane);
         // If we're in multi-pane mode, show the detail pane if it isn't already visible.
         if (multiPane && commentFragment.isHidden()) {
             fragmentManager.beginTransaction()
@@ -66,9 +71,6 @@ public class MainActivity extends Activity implements ClassListFragment.OnCommen
             .addToBackStack(null)
             .commit();
         }
-        // Show the current story.
-        ((CommentFragment) commentFragment).setCommentPane(recipient,
-                mContentResolver, multiPane);
     }
 
 }

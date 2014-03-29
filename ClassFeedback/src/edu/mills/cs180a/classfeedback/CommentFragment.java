@@ -18,14 +18,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-// TODO documentation
+/**
+ * Fragment to enter, save and send comments to the specified recipient.
+ * 
+ * @author ctaymor@gmail.com (Caroline Taymor)
+ */
 public class CommentFragment extends Fragment {
     private static final String TAG = "COMMENT_FRAGMENT";
-    int mRecipient;
-    ContentResolver mContentResolver;
-    FragmentManager mFragmentManager;
-    Fragment classListFragment;
-    boolean mMultiPane;
+    private Person mPerson;
+    private ContentResolver mContentResolver;
+    private FragmentManager mFragmentManager;
+    private Fragment classListFragment;
+    private boolean mMultiPane;
     
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -34,21 +38,19 @@ public class CommentFragment extends Fragment {
         return view;
     }
     
-    protected void setCommentPane(int recipient, ContentResolver contResolver,
+    protected void setCommentPane(Person person, ContentResolver contResolver,
             boolean multiPane) {
         View view = getView();
-        mRecipient = recipient;
+        mPerson = person;
         mContentResolver = contResolver;
         mFragmentManager = getFragmentManager();
         classListFragment = mFragmentManager.findFragmentById(R.id.listFragment);
         mMultiPane = multiPane;
         
         // Show a picture of the recipient.
-        // TODO: This is showing the wrong person.
-        assert(mRecipient >= 0 && mRecipient < Person.everyone.length);
-        Person person = Person.everyone[recipient];
+
         ImageView icon = (ImageView) view.findViewById(R.id.commentImageView);
-        icon.setImageResource(person.getImageId());
+        icon.setImageResource(mPerson.getImageId());
         
         // Show comment if one exists
         EditText commentField =
@@ -68,7 +70,7 @@ public class CommentFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 EditText commentField = (EditText) view.findViewById(R.id.commentEditText);
-                String mRecipientEmail = Person.everyone[mRecipient].getEmail();
+                String mRecipientEmail = mPerson.getEmail();
                 ContentValues values = new ContentValues();
                 values.put("recipient", mRecipientEmail);
                 values.put("content", commentField.getText().toString());
@@ -141,8 +143,8 @@ public class CommentFragment extends Fragment {
              public void onClick(View view) {
                  Intent intent = new Intent(Intent.ACTION_SEND);
                  intent.setType("message/rfc822");
-                 String [] emails = {Person.everyone[mRecipient].getEmail()};
-                 String mRecipientEmail = Person.everyone[mRecipient].getEmail();
+                 String [] emails = {mPerson.getEmail()};
+                 String mRecipientEmail = mPerson.getEmail();
                  Cursor cursor = mContentResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
                          + "/" + mRecipientEmail), null, null, null, null);
                  //Expect only one comment returned (because unique comments for recipient
@@ -152,7 +154,7 @@ public class CommentFragment extends Fragment {
                      intent.putExtra(Intent.EXTRA_EMAIL, emails);
                      intent.putExtra(Intent.EXTRA_SUBJECT, "Comment from class feedback app");
                      intent.putExtra(Intent.EXTRA_TEXT, mComment.getContent());
-                     startActivityForResult(Intent.createChooser(intent, "Send Email"), mRecipient);
+                     startActivityForResult(Intent.createChooser(intent, "Send Email"), mPerson.getImageId());
                  } else {
                      Toast.makeText(getActivity(),
                              R.string.mailing_null, 
@@ -169,7 +171,6 @@ public class CommentFragment extends Fragment {
      * 
      */
     protected void deleteComment() {
-        Person mPerson = Person.everyone[mRecipient];
         int deleteSuccessIndicator = 
                 mContentResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
                         + "/" + mPerson.getEmail()), null, null);
@@ -196,7 +197,7 @@ public class CommentFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         } else {
             //This should never happen because comments are unique for each user
-            Log.w(TAG, "Multiple comments were deleted for: " + Person.everyone[mRecipient]);
+            Log.w(TAG, "Multiple comments were deleted for: " + mPerson);
         }
     }
     

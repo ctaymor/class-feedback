@@ -3,8 +3,8 @@ package edu.mills.cs180a.classfeedback;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,7 +28,6 @@ import android.widget.TextView;
 public class ClassListFragment extends Fragment {
     private LayoutInflater mInflater;
     private OnCommentClickedListener mComListener;
-    private int mPosition;
     
     /**
      * Interface definition to be invoked when a user clicks on the
@@ -36,9 +36,9 @@ public class ClassListFragment extends Fragment {
     protected interface OnCommentClickedListener {
         /**
          * Called when the comment button is clicked
-         * @param mRecipeient the list position for recipient for the comment
+         * @param person the recipient for the comment
          */
-        public void onCommentClicked(int mRecipient);
+        public void onCommentClicked(Person person);
     }
     
     @Override
@@ -69,6 +69,8 @@ public class ClassListFragment extends Fragment {
     }
     
     private class PersonArrayAdapter extends ArrayAdapter<Person> {
+        protected static final String TAG = "PERSON_ARRAY_ADAPTER";
+
         PersonArrayAdapter(Context context) {
             super(context, R.layout.fragment_class_list_row,
                     R.id.rowTextView, Person.everyone);
@@ -78,22 +80,24 @@ public class ClassListFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             // Handling click events from a row inside a ListView gets very strange.
             // Solution found at "http://stackoverflow.com/questions/1821871".
-            mPosition = position;
             if (null == convertView) {
                 convertView = mInflater.inflate(R.layout.fragment_class_list_row, null);
             }
-            Button button = (Button) convertView.findViewById(R.id.rowButtonView);
-            button.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick (View view) {
-                    mComListener.onCommentClicked(mPosition);
-                }
-            });
             Person person = getItem(position);
             ImageView icon = (ImageView) convertView.findViewById(R.id.rowImageView);
             icon.setImageResource(person.getImageId());
             TextView name = (TextView) convertView.findViewById(R.id.rowTextView);
             name.setText(person.getFirstName());
+            
+            Button button = (Button) convertView.findViewById(R.id.rowButtonView);
+            button.setTag(person);
+            button.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick (View view) {
+                    Person person = (Person) view.getTag();
+                    mComListener.onCommentClicked(person);
+                }
+            });
             return convertView;
         }
     }

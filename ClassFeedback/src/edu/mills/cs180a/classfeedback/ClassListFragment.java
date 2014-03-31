@@ -36,9 +36,9 @@ public class ClassListFragment extends Fragment {
     protected interface OnCommentClickedListener {
         /**
          * Called when the comment button is clicked
-         * @param person the recipient for the comment
+         * @param position the index of the recipient for the comment
          */
-        public void onCommentClicked(Person person);
+        public void onCommentClicked(int position);
     }
     
     @Override
@@ -104,12 +104,13 @@ public class ClassListFragment extends Fragment {
             holder.icon.setImageResource(person.getImageId());
             holder.name.setText(person.getFirstName());
 
-            holder.commentB.setTag(person);
+            Integer pos = (Integer) position;
+            holder.commentB.setTag(pos);
             holder.commentB.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick (View view) {
-                    Person person = (Person) view.getTag();
-                    mComListener.onCommentClicked(person);
+                    int position = (int) (Integer) view.getTag();
+                    mComListener.onCommentClicked(position);
                 }
             });
             return convertView;

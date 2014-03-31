@@ -1,3 +1,19 @@
+Q1: What do you think would be bet for the user to see when:
+- Rotating the tablet from landscape to portrait when both
+fragments are visible.
+
+The list fragment should be hidden and the comment detail fragment
+should remain visible.
+
+-Rotating the tablet from portrait to landscape view when the
+detail fragment is visible.
+
+The list fragment and the comment detail fragment should both
+be made visible.
+
+Problem: (the one I emailed ellen about)
+Solution:
+
 Problem:
 When I clicked on the comment button for, say, Christie, Colin's
 comment fragment would show up. It appeared somewhat random 

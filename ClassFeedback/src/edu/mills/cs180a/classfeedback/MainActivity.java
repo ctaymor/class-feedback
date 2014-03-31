@@ -17,15 +17,20 @@ import android.widget.Toast;
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */
-public class MainActivity extends Activity implements ClassListFragment.OnCommentClickedListener {
+public class MainActivity extends Activity
+    implements ClassListFragment.OnCommentClickedListener {
     private static final String TAG = "MainActivity";
     private static final int MIN_MULTIPANE_WIDTH = 700;
     static final String SUCCESS_TYPE = "RESULT_SUCCESS_TYPE";
+    private static final String KEY_CUR_RECIP = "CURRENT_RECIPIENT";
+    private static final String KEY_IS_COMMENT_VIS = "IS_COMMENT_VIS";
     private FragmentManager fragmentManager;
     private Fragment classListFragment;
     private Fragment commentFragment;
     private boolean multiPane;
     private ContentResolver mContentResolver;
+    int mCurrentRecipient = -1; // -1 if no recip
+    boolean mComFragVis = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +48,53 @@ public class MainActivity extends Activity implements ClassListFragment.OnCommen
         float screenHeightDp = displayMetrics.heightPixels / displayMetrics.density;
         multiPane = screenWidthDp >= MIN_MULTIPANE_WIDTH;
         
-        // TODO: Handle rotation
-        fragmentManager.beginTransaction()
-        .hide(commentFragment)
-        .commit();
+        if (savedInstanceState != null) {
+            mCurrentRecipient = savedInstanceState.getInt(KEY_CUR_RECIP);
+            mComFragVis = savedInstanceState.getBoolean(KEY_IS_COMMENT_VIS, false);
+            if (mComFragVis) {
+                //assertNotEquals(-1, mCurrentRecipient);
+                if (multiPane) {
+                    Person person = Person.everyone[mCurrentRecipient];
+                    ((CommentFragment) commentFragment).setCommentPane(person,
+                            mContentResolver, multiPane);
+                    fragmentManager.beginTransaction()
+                    .show(commentFragment)
+                    .addToBackStack(null)
+                    .commit();               
+                } else {
+                    Person person = Person.everyone[mCurrentRecipient];
+                    ((CommentFragment) commentFragment).setCommentPane(person,
+                            mContentResolver, multiPane);
+                    fragmentManager.beginTransaction()
+                        .hide(classListFragment).show(commentFragment)
+                        .commit();
+                }            
+            } else {
+                fragmentManager.beginTransaction()
+                    .hide(commentFragment).commit();
+            }
+        } else {
+            fragmentManager.beginTransaction()
+            .hide(commentFragment).commit();
         }
+    }
     
-    // @Override
-    public void onCommentClicked(Person person) {
-        //Log.d(TAG, "nowtesting: onCommentClicked with recipient " + recipient);
-        //assert(recipient >= 0 && recipient < Person.everyone.length);
-        // Show the current story.
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean(KEY_IS_COMMENT_VIS, mComFragVis);
+        savedInstanceState.putInt(KEY_CUR_RECIP, mCurrentRecipient);
+    }
+    
+    @Override
+    public void onCommentClicked(int recipient) {
+        // Show the current Comment.
+        Person person = Person.everyone[recipient];
         ((CommentFragment) commentFragment).setCommentPane(person,
                 mContentResolver, multiPane);
+        mCurrentRecipient = recipient ;
+        mComFragVis = true;
         // If we're in multi-pane mode, show the detail pane if it isn't already visible.
         if (multiPane && commentFragment.isHidden()) {
             fragmentManager.beginTransaction()
@@ -72,5 +111,4 @@ public class MainActivity extends Activity implements ClassListFragment.OnCommen
             .commit();
         }
     }
-
 }

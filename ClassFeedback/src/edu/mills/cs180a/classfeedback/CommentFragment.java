@@ -1,5 +1,6 @@
 package edu.mills.cs180a.classfeedback;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
@@ -48,7 +49,6 @@ public class CommentFragment extends Fragment {
         mMultiPane = multiPane;
         
         // Show a picture of the recipient.
-
         ImageView icon = (ImageView) view.findViewById(R.id.commentImageView);
         icon.setImageResource(mPerson.getImageId());
         
@@ -76,20 +76,7 @@ public class CommentFragment extends Fragment {
                 values.put("content", commentField.getText().toString());
                 mContentResolver.insert(Uri.parse(CommentContentProvider.CONTENT_URI
                         + "/" + mRecipientEmail), values);
-                if (mMultiPane) {
-                    mFragmentManager.beginTransaction()
-                    .hide(CommentFragment.this)
-                    .addToBackStack(null)
-                    .commit();
-                }
-                // If we're in single-pane mode, show the detail panel and hide the overview list.
-                else if (!mMultiPane) {
-                    mFragmentManager.beginTransaction()
-                    .show(classListFragment)
-                    .hide(CommentFragment.this)
-                    .addToBackStack(null)
-                    .commit();
-                }
+                hideCommentFrag();
                 Toast.makeText(getActivity(),
                         R.string.comment_added, Toast.LENGTH_SHORT).show();
             }
@@ -109,21 +96,8 @@ public class CommentFragment extends Fragment {
         cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mMultiPane) {
-                    mFragmentManager.beginTransaction()
-                    .hide(CommentFragment.this)
-                    .addToBackStack(null)
-                    .commit();
-                }
-                // If we're in single-pane mode, show the detail panel and hide the overview list.
-                else if (!mMultiPane) {
-                    mFragmentManager.beginTransaction()
-                    .show(classListFragment)
-                    .hide(CommentFragment.this)
-                    .addToBackStack(null)
-                    .commit();
-                }
-                Toast.makeText(getActivity(),
+               hideCommentFrag();
+               Toast.makeText(getActivity(),
                         R.string.comment_canceled, Toast.LENGTH_SHORT).show();
             }
         });
@@ -148,7 +122,6 @@ public class CommentFragment extends Fragment {
                  Cursor cursor = mContentResolver.query(Uri.parse(CommentContentProvider.CONTENT_URI
                          + "/" + mRecipientEmail), null, null, null, null);
                  //Expect only one comment returned (because unique comments for recipient
-                 // TODO I think recipient here maybe is supposed to be the email not the int??
                  if (cursor.moveToFirst()) {
                      Comment mComment = cursorToComment(cursor);
                      intent.putExtra(Intent.EXTRA_EMAIL, emails);
@@ -175,20 +148,7 @@ public class CommentFragment extends Fragment {
                 mContentResolver.delete(Uri.parse(CommentContentProvider.CONTENT_URI
                         + "/" + mPerson.getEmail()), null, null);
         if (deleteSuccessIndicator == 1) {
-            if (mMultiPane) {
-                mFragmentManager.beginTransaction()
-                .hide(CommentFragment.this)
-                .addToBackStack(null)
-                .commit();
-            }
-            // If we're in single-pane mode, show the detail panel and hide the overview list.
-            else if (!mMultiPane) {
-                mFragmentManager.beginTransaction()
-                .show(classListFragment)
-                .hide(CommentFragment.this)
-                .addToBackStack(null)
-                .commit();
-            }
+            hideCommentFrag();
             Toast.makeText(getActivity(),
                     R.string.comment_deleted, Toast.LENGTH_SHORT).show();
         } else if (deleteSuccessIndicator == 0) {
@@ -213,5 +173,24 @@ public class CommentFragment extends Fragment {
     private Comment cursorToComment(Cursor cursor) {
         return new Comment(cursor.getLong(0), cursor.getString(1), 
                 cursor.getString(2));
+    }
+    
+    private void hideCommentFrag() {
+        if (mMultiPane) {
+            mFragmentManager.beginTransaction()
+            .hide(CommentFragment.this)
+            .addToBackStack(null)
+            .commit();
+        }
+        // If we're in single-pane mode, show the detail panel and hide the overview list.
+        else if (!mMultiPane) {
+            mFragmentManager.beginTransaction()
+            .show(classListFragment)
+            .hide(CommentFragment.this)
+            .addToBackStack(null)
+            .commit();
+        }
+        ((MainActivity) getActivity()).mCurrentRecipient = -1;
+        ((MainActivity) getActivity()).mComFragVis = false;
     }
 }

@@ -4,15 +4,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.widget.Toast;
 
 /**
  * An {@code Activity} that displays a list of the names of {@link Person people in CS 180A}.
- * If a name is clicked on, a {@link CommentActivity} is opened, soliciting a
+ * If a name is clicked on, a {@link CommentFragment} is shown, soliciting a
  * comment for the selected person.
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
@@ -29,7 +26,7 @@ public class MainActivity extends Activity
     private Fragment commentFragment;
     private boolean multiPane;
     private ContentResolver mContentResolver;
-    int mCurrentRecipient = -1; // -1 if no recip
+    int mCurrentRecipient;
     boolean mComFragVis = false;
     
     @Override
@@ -37,7 +34,6 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContentResolver = getContentResolver();
-        
         fragmentManager = getFragmentManager();
         classListFragment = fragmentManager.findFragmentById(R.id.listFragment);
         commentFragment = fragmentManager.findFragmentById(R.id.commentFragment);
@@ -52,7 +48,6 @@ public class MainActivity extends Activity
             mCurrentRecipient = savedInstanceState.getInt(KEY_CUR_RECIP);
             mComFragVis = savedInstanceState.getBoolean(KEY_IS_COMMENT_VIS, false);
             if (mComFragVis) {
-                //assertNotEquals(-1, mCurrentRecipient);
                 if (multiPane) {
                     Person person = Person.everyone[mCurrentRecipient];
                     ((CommentFragment) commentFragment).setCommentPane(person,

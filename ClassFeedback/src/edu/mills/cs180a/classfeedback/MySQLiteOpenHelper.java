@@ -3,7 +3,6 @@ package edu.mills.cs180a.classfeedback;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Creates and upgrades a database for storing {@link Comment}s.

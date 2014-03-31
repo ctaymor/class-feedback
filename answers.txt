@@ -11,8 +11,23 @@ detail fragment is visible.
 The list fragment and the comment detail fragment should both
 be made visible.
 
-Problem: (the one I emailed ellen about)
-Solution:
+This was successful.
+
+Problem: I got a RuntimeException when I tried to set the ContentView.
+This stumped me for a while, because the first bits of my code I 
+was running into in the LogCat trace had to do with the XML files. I
+couldn't see any problems in the XML files. I tried to mimic the XML
+files of the Rss reader app to start, since the fragments worked
+there, but that didn't help. I emailed Ellen, and she found that later
+in the error trace, there was another Exception, which was quite
+explicit in how to fix the problem.
+
+Solution: Make MainActivity implement
+ClassListFragment.OnCommentClickedListener. I didn't figure this out,
+Ellen did. The real lesson here for me was that I need to look deeper
+at the LogCat files, and not assume that the info is at the first
+reference to my code after an Exception, because the RuntimeException
+was caused by a ClassCastException much later in the code.
 
 Problem:
 When I clicked on the comment button for, say, Christie, Colin's

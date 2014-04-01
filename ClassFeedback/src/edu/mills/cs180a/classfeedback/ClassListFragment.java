@@ -16,9 +16,9 @@ import android.widget.TextView;
 
 /**
  * Fragment to display a list of students with their pictures.  Clicking on
- * a the comment button for a student notifies an
- * {@link OnStorySelectedListener}, which will presumably cause the 
- * {@link DetailFragment} to be displayed.
+ * the comment button for a student notifies an
+ * {@link OnCommentClickedListener}, which will presumably cause the 
+ * {@link CommentFragment} to be displayed.
  * 
  * @author ctaymor@gmail.com (Caroline Taymor)
  * @version 1

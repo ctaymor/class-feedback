@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Creates and upgrades a database for storing {@link Comment}s.
- * Clients should access the database through {@link CommentsDataSource}.
+ * Clients should access the database through {@link CommentContentProvider}.
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */

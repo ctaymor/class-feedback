@@ -12,7 +12,7 @@ import android.util.Log;
 
 /**
  * A content provider for comments meant for specified individuals,
- * backed by {@link CommentsDataSource}.
+ * backed by {@link MySQLiteOpenHelper}.
  * 
  * @author ellen.spertus@gmail.com (Ellen Spertus)
  */

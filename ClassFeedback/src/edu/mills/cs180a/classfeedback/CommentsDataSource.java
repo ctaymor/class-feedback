@@ -54,6 +54,7 @@ public class CommentsDataSource {
 
     /**
      * Creates a comment with the specified content for the specified recipient.
+     * 
      * This both adds the comment to the database and constructs a {@link Comment}
      * instance.
      * 
@@ -76,6 +77,7 @@ public class CommentsDataSource {
     
     /**
      * Updates content and recipient of the comment to the database.
+     * 
      * This is used when the content or recipient
      * of a comment has been changed. This updates that new information to the 
      * comment in the database. 
@@ -200,11 +202,11 @@ public class CommentsDataSource {
     }
     
     protected void saveComment(Person person, String commentText) {
-        Comment mOldComment =
+        Comment mComment =
                 getCommentForRecipient(person.getEmail());
-        if (mOldComment != null) {
-            mOldComment.setContent(commentText);
-            updateComment(mOldComment);
+        if (mComment != null) {
+            mComment.setContent(commentText);
+            updateComment(mComment);
         } else {
             createComment(person.getEmail(), commentText);
         }

@@ -198,4 +198,15 @@ public class CommentsDataSource {
                 cursor.getString(MySQLiteOpenHelper.COLUMN_CONTENT_POS));
         return comment;
     }
+    
+    protected void saveComment(Person person, String commentText) {
+        Comment mOldComment =
+                getCommentForRecipient(person.getEmail());
+        if (mOldComment != null) {
+            mOldComment.setContent(commentText);
+            updateComment(mOldComment);
+        } else {
+            createComment(person.getEmail(), commentText);
+        }
+    }
 }

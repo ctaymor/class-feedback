@@ -63,15 +63,7 @@ public class CommentActivity extends Activity {
                 EditText commentField =
                         (EditText) findViewById(R.id.commentEditText);
                 Person mPerson = Person.everyone[recipient];
-                Comment mOldComment =
-                        cds.getCommentForRecipient(mPerson.getEmail());
-                if (mOldComment != null) {
-                    mOldComment.setContent(commentField.getText().toString());
-                    cds.updateComment(mOldComment);
-                } else {
-                    cds.createComment(mPerson.getEmail(), 
-                            commentField.getText().toString());
-                }
+                cds.saveComment(mPerson, commentField.getText().toString());
                 Intent i = new Intent();
                 i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
                 setResult(RESULT_OK, i);

@@ -119,7 +119,7 @@ public class CommentsDataSource {
      * @param projection the names of the columns to retrieve
      * @return a {@code Cursor} pointing to all comments for the recipient
      */
-    Cursor getCursorForCommentsForRecipient(String recipient,
+    Cursor getCursorForCommentForRecipient(String recipient,
             String[] projection) {
         if (database == null) {
             open();
@@ -137,7 +137,7 @@ public class CommentsDataSource {
      * @return the count of the total comments targeted to the recipient
      */
     int getCountOfCommentsForRecipient(String recipient) {
-       return getCursorForCommentsForRecipient(recipient, null).getCount();
+       return getCursorForCommentForRecipient(recipient, null).getCount();
     }
     
     /**
@@ -148,7 +148,7 @@ public class CommentsDataSource {
      * @return the comment targeted to the user, null if no comments for the user
      */
     Comment getCommentForRecipient(String recipient) {
-        Cursor mCursor = getCursorForCommentsForRecipient(recipient, null);
+        Cursor mCursor = getCursorForCommentForRecipient(recipient, null);
         if (mCursor.getCount() != 0) {
             mCursor.moveToFirst();
             return cursorToComment(mCursor);     

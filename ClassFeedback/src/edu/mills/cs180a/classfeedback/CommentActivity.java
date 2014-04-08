@@ -29,7 +29,7 @@ import android.widget.Toast;
  */
 public class CommentActivity extends Activity {
     static final String RECIPIENT = "COMMENT_RECIPIENT";
-    private int recipient;
+    private int mRecipient;
     private static final String TAG = "CommentActivity";
     private EditText mCommentField;
     private ImageView mIcon;
@@ -47,7 +47,7 @@ public class CommentActivity extends Activity {
         setContentView(R.layout.activity_comment);
         mCommentField = (EditText) findViewById(R.id.commentEditText);
         mIcon = (ImageView) findViewById(R.id.commentImageView);
-        mPerson = Person.everyone[recipient];
+        mPerson = Person.everyone[mRecipient];
         mSaveButton = (Button) findViewById(R.id.saveCommentButton);
         mClearButton = (Button) findViewById(R.id.clearCommentButton);
         mCancelButton = (Button) findViewById(R.id.cancelCommentButton);
@@ -55,8 +55,8 @@ public class CommentActivity extends Activity {
         mMailButton = (Button) findViewById(R.id.mailCommentButton);
         
         // Show a picture of the recipient.
-        recipient = getIntent().getIntExtra(RECIPIENT, -1);
-        assert(recipient >= 0 && recipient < Person.everyone.length);
+        mRecipient = getIntent().getIntExtra(RECIPIENT, -1);
+        assert(mRecipient >= 0 && mRecipient < Person.everyone.length);
         mIcon.setImageResource(mPerson.getImageId());
         
         // Get a connection to the database.
@@ -119,7 +119,7 @@ public class CommentActivity extends Activity {
              public void onClick(View view) {
                  Intent intent = new Intent(Intent.ACTION_SEND);
                  intent.setType("message/rfc822");
-                 String [] emails = {Person.everyone[recipient].getEmail()};
+                 String [] emails = {Person.everyone[mRecipient].getEmail()};
                  intent.putExtra(Intent.EXTRA_EMAIL, emails);
                  intent.putExtra(Intent.EXTRA_SUBJECT,
                          "Comment from class feedback app");

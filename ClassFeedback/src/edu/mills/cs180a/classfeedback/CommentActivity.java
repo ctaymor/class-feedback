@@ -31,39 +31,49 @@ public class CommentActivity extends Activity {
     static final String RECIPIENT = "COMMENT_RECIPIENT";
     private int recipient;
     private static final String TAG = "CommentActivity";
+    private EditText mCommentField;
+    private ImageView mIcon;
+    private Button mSaveButton;
+    private Button mClearButton;
+    private Button mCancelButton;
+    private Button mDeleteButton;
+    private Button mMailButton;
+    private Person mPerson;
+    private Comment mComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
+        mCommentField = (EditText) findViewById(R.id.commentEditText);
+        mIcon = (ImageView) findViewById(R.id.commentImageView);
+        mPerson = Person.everyone[recipient];
+        mSaveButton = (Button) findViewById(R.id.saveCommentButton);
+        mClearButton = (Button) findViewById(R.id.clearCommentButton);
+        mCancelButton = (Button) findViewById(R.id.cancelCommentButton);
+        mDeleteButton = (Button) findViewById(R.id.deleteCommentButton);
+        mMailButton = (Button) findViewById(R.id.mailCommentButton);
         
         // Show a picture of the recipient.
         recipient = getIntent().getIntExtra(RECIPIENT, -1);
         assert(recipient >= 0 && recipient < Person.everyone.length);
-        Person person = Person.everyone[recipient];
-        ImageView icon = (ImageView) findViewById(R.id.commentImageView);
-        icon.setImageResource(person.getImageId());
+        mIcon.setImageResource(mPerson.getImageId());
         
         // Get a connection to the database.
         final CommentsDataSource cds = new CommentsDataSource(this);
         cds.open();
         
         // Show comment
-        EditText commentField = (EditText) findViewById(R.id.commentEditText);
-        Comment comment = cds.getCommentForRecipient(person.getEmail());
-        if (comment != null) {
-            commentField.setText(comment.getContent());
+        mComment = cds.getCommentForRecipient(mPerson.getEmail());
+        if (mComment != null) {
+            mCommentField.setText(mComment.getContent());
         }
             
         // Add listeners.
-        Button saveButton = (Button) findViewById(R.id.saveCommentButton);
-        saveButton.setOnClickListener(new OnClickListener(){
+        mSaveButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View view) {
-                EditText commentField =
-                        (EditText) findViewById(R.id.commentEditText);
-                Person mPerson = Person.everyone[recipient];
-                cds.saveComment(mPerson, commentField.getText().toString());
+                cds.saveComment(mPerson, mCommentField.getText().toString());
                 Intent i = new Intent();
                 i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
                 setResult(RESULT_OK, i);
@@ -71,18 +81,14 @@ public class CommentActivity extends Activity {
             }
         });
         
-        Button clearButton = (Button) findViewById(R.id.clearCommentButton);
-        clearButton.setOnClickListener(new OnClickListener() {
+        mClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick (View view) {
-                EditText commentField =
-                        (EditText) findViewById(R.id.commentEditText);
-                commentField.setText(R.string.empty);
+                mCommentField.setText(R.string.empty);
             }
         });
         
-        Button cancelButton = (Button) findViewById(R.id.cancelCommentButton);
-        cancelButton.setOnClickListener(new OnClickListener() {
+        mCancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 setResult(RESULT_CANCELED);
@@ -90,16 +96,9 @@ public class CommentActivity extends Activity {
             }
         });
         
-         Button deleteButton =
-                 (Button) findViewById(R.id.deleteCommentButton);
-         deleteButton.setOnClickListener(new OnClickListener() {
+         mDeleteButton.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
-                 EditText commentField =
-                         (EditText) findViewById(R.id.commentEditText);
-                 Person mPerson = Person.everyone[recipient];
-                 Comment mComment =
-                         cds.getCommentForRecipient(mPerson.getEmail());
                  if (mComment != null) {
                      cds.deleteComment(mComment);
                      Intent i =  new Intent();
@@ -115,16 +114,12 @@ public class CommentActivity extends Activity {
              }
          });
          
-         Button mailButton = (Button) findViewById(R.id.mailCommentButton);
-         mailButton.setOnClickListener(new OnClickListener() {
+         mMailButton.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
                  Intent intent = new Intent(Intent.ACTION_SEND);
                  intent.setType("message/rfc822");
                  String [] emails = {Person.everyone[recipient].getEmail()};
-                 Comment mComment =
-                         cds.getCommentForRecipient(
-                                 Person.everyone[recipient].getEmail());
                  intent.putExtra(Intent.EXTRA_EMAIL, emails);
                  intent.putExtra(Intent.EXTRA_SUBJECT,
                          "Comment from class feedback app");

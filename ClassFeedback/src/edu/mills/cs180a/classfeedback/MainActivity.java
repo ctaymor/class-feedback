@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
             int resultCode, Intent data) {
         int resultMessageResourceId = 0;
         if (resultCode == RESULT_OK) {
-            if (data.getStringExtra(SUCCESS_TYPE).equals("Deleted")) {
+            if (data.getStringExtra(SUCCESS_TYPE).equals(R.string.deleted)) {
                 resultMessageResourceId = R.string.comment_deleted;
             } else {
                 resultMessageResourceId = R.string.comment_added;

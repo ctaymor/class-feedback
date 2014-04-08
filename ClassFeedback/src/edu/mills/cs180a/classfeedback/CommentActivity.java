@@ -75,7 +75,7 @@ public class CommentActivity extends Activity {
             public void onClick(View view) {
                 cds.saveComment(mPerson, mCommentField.getText().toString());
                 Intent i = new Intent();
-                i.putExtra(MainActivity.SUCCESS_TYPE, "Saved");
+                i.putExtra(MainActivity.SUCCESS_TYPE, R.string.saved);
                 setResult(RESULT_OK, i);
                 finish();
             }
@@ -102,7 +102,7 @@ public class CommentActivity extends Activity {
                  if (mComment != null) {
                      cds.deleteComment(mComment);
                      Intent i =  new Intent();
-                     i.putExtra(MainActivity.SUCCESS_TYPE, "Deleted");
+                     i.putExtra(MainActivity.SUCCESS_TYPE, R.string.deleted);
                      setResult(RESULT_OK, i);
                      finish();
                  } else {
@@ -110,7 +110,6 @@ public class CommentActivity extends Activity {
                              R.string.deleting_null, 
                              Toast.LENGTH_SHORT).show();
                  }
-
              }
          });
          
@@ -122,7 +121,7 @@ public class CommentActivity extends Activity {
                  String [] emails = {Person.everyone[mRecipient].getEmail()};
                  intent.putExtra(Intent.EXTRA_EMAIL, emails);
                  intent.putExtra(Intent.EXTRA_SUBJECT,
-                         "Comment from class feedback app");
+                         R.string.email_subject_intent_extra);
                  intent.putExtra(Intent.EXTRA_TEXT, mComment.getContent());
                  startActivity(Intent.createChooser(intent, "Send Email"));
              }

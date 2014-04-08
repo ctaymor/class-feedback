@@ -144,16 +144,16 @@ public class CommentsDataSource {
     
     /**
      * Retrieves the unique comment targeted to the recipient from the
-     * database
+     * database.
      * 
      * @param recipient the email address of the target of the comments
      * @return the comment targeted to the user, null if no comments for the user
      */
     Comment getCommentForRecipient(String recipient) {
-        Cursor mCursor = getCursorForCommentForRecipient(recipient, null);
-        if (mCursor.getCount() != 0) {
-            mCursor.moveToFirst();
-            return cursorToComment(mCursor);     
+        Cursor cursor = getCursorForCommentForRecipient(recipient, null);
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            return cursorToComment(cursor);     
         } else {
             return null;
         }
@@ -202,11 +202,11 @@ public class CommentsDataSource {
     }
     
     protected void saveComment(Person person, String commentText) {
-        Comment mComment =
+        Comment comment =
                 getCommentForRecipient(person.getEmail());
-        if (mComment != null) {
-            mComment.setContent(commentText);
-            updateComment(mComment);
+        if (comment != null) {
+            comment.setContent(commentText);
+            updateComment(comment);
         } else {
             createComment(person.getEmail(), commentText);
         }
